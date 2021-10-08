@@ -11,3 +11,7 @@ run command to connect to git repo - e.g....
 git clone https://github.com/pennyberry/Public.git
 
 authenticate as needed
+
+cd to the folder that was cloned - usually c:\users\<user>\<git-repo-name>\
+
+e.g. c:\users\administrator\public
