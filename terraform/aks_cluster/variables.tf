@@ -57,7 +57,7 @@ variable "resource_group_name_prefix" {
   description = "Prefix of the resource group name that's combined with a random ID so name is unique in your Azure subscription."
 }
 variable "azurerm_kubernetes_cluster_default_node_pool_vm_size" {
-  default = "Standard_D2s_v5"
+  default = "Standard_D4s_v5"
 }
 variable "azurerm_kubernetes_cluste_default_node_pool_name" {
   default = "agentpool"
