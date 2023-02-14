@@ -22,7 +22,6 @@ variable "prefix" {
 
 variable "domain_name" {
   type        = string
-  default     = "infra.local"
   description = "Name of the domain to join"
 }
 

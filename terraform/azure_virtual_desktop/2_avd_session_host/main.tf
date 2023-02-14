@@ -26,6 +26,7 @@ resource "azurerm_network_interface" "avd_vm_nic" {
   name                = "${var.prefix}-${count.index + 1}-nic"
   resource_group_name = data.terraform_remote_state.remotestate.outputs.resource_group_name
   location            = data.terraform_remote_state.remotestate.outputs.location
+  enable_accelerated_networking = true
 
   ip_configuration {
     name                          = "nic${count.index + 1}_config"
@@ -48,7 +49,7 @@ resource "azurerm_windows_virtual_machine" "avd_vm" {
   os_disk {
     name                 = "${lower(var.prefix)}-${count.index + 1}"
     caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
+    storage_account_type = "Premium_LRS"
   }
 
   source_image_reference {
@@ -66,7 +67,7 @@ resource "azurerm_windows_virtual_machine" "avd_vm" {
 
 resource "azurerm_virtual_machine_extension" "domain_join" {
   count                      = var.rdsh_count
-  name                       = "${var.prefix}-${count.index + 1}-domainJoin"
+  name                       = "${azurerm_windows_virtual_machine.avd_vm.*.name[count.index]}-domainJoin"
   virtual_machine_id         = azurerm_windows_virtual_machine.avd_vm.*.id[count.index]
   publisher                  = "Microsoft.Compute"
   type                       = "JsonADDomainExtension"
@@ -74,14 +75,15 @@ resource "azurerm_virtual_machine_extension" "domain_join" {
   auto_upgrade_minor_version = true
 
   settings = <<SETTINGS
+  
     {
-      "Name": "${var.domain_name}",
-      "OUPath": "${var.ou_path}",
-      "User": "${var.domain_user_upn}@${var.domain_name}",
-      "Restart": "true",
-      "Options": "3"
+        "Name":   "${var.domain_name}",
+        "OUPath": "${var.ou_path}",
+        "User":   "${var.domain_name}\\${var.domain_user_upn}",
+        "Restart": "true",
+        "Options": "3"
     }
-SETTINGS
+  SETTINGS
 
   protected_settings = <<PROTECTED_SETTINGS
     {
