@@ -1,1 +1,1 @@
-install-WindowsFeature AD-Domain-Services, AD-Certificate -Restart -IncludeManagementTools -IncludeAllSubFeature
+install-WindowsFeature AD-Domain-Services, AD-Certificate, DNS -Restart -IncludeManagementTools -IncludeAllSubFeature
