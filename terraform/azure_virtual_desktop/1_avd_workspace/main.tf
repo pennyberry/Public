@@ -35,7 +35,7 @@ resource "azurerm_virtual_desktop_host_pool" "hostpool" {
   name                     = var.hostpool
   friendly_name            = var.hostpool
   validate_environment     = true
-  custom_rdp_properties    = "audiocapturemode:i:1;audiomode:i:0;"
+  custom_rdp_properties    = "audiocapturemode:i:1;audiomode:i:0;enablerdsaadauth:i:1;compression:i:1;videoplaybackmode:i:1;redirectclipboard:i:1;keyboardhook:i:1"
   description              = "${var.prefix} Terraform HostPool"
   type                     = "Pooled"
   maximum_sessions_allowed = 16
