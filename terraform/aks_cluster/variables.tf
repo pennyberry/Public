@@ -66,7 +66,7 @@ variable "azurerm_kubernetes_cluster_linux_profile_admin_username" {
   default = "ubuntu"
 }
 variable "azurerm_kubernetes_cluster_network_profile_network_plugin" {
-  default = "kubenet"
+  default = "azure"
 }
 variable "azurerm_kubernetes_cluster_network_profile_load_balancer_sku" {
   default = "standard"
@@ -82,3 +82,5 @@ variable "subnet_name" {
 }
 variable "subnet_address_prefixes" {}
 variable "subnet_resource_group_name" {}
+variable "aks_address_prefixes" {}
+variable "dns_service_ip" {}

@@ -78,8 +78,9 @@ resource "azurerm_kubernetes_cluster" "k8s" {
   network_profile {
     network_plugin    = var.azurerm_kubernetes_cluster_network_profile_network_plugin
     load_balancer_sku = var.azurerm_kubernetes_cluster_network_profile_load_balancer_sku
-    service_cidr = var.subnet_address_prefixes
-    pod_cidr = var.subnet_address_prefixes
+    service_cidr = var.aks_address_prefixes
+    docker_bridge_cidr = var.aks_address_prefixes
+    dns_service_ip = var.dns_service_ip
   }
   service_principal {
     client_id     = var.aks_service_principal_app_id
