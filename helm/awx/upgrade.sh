@@ -1,1 +1,0 @@
-helm upgrade my-awx-operator awx-operator/awx-operator -n awx --create-namespace

@@ -45,6 +45,7 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     name       = var.azurerm_kubernetes_cluste_default_node_pool_name
     vm_size    = var.azurerm_kubernetes_cluster_default_node_pool_vm_size
     node_count = var.agent_count
+    vnet_subnet_id = var.vnet_subnet_id
   }
   linux_profile {
     admin_username = var.azurerm_kubernetes_cluster_linux_profile_admin_username
@@ -60,5 +61,8 @@ resource "azurerm_kubernetes_cluster" "k8s" {
   service_principal {
     client_id     = var.aks_service_principal_app_id
     client_secret = var.aks_service_principal_client_secret
+  }
+  api_server_access_profile {
+    subnet_id = var.vnet_subnet_id
   }
 }

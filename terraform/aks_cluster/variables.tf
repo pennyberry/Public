@@ -75,3 +75,4 @@ variable "azurerm_kubernetes_cluster_network_profile_load_balancer_sku" {
 variable "ssh_public_key" {
   default = "~/.ssh/id_rsa.pub"
 }
+variable "vnet_subnet_id" {}
