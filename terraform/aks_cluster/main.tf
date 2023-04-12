@@ -6,6 +6,11 @@ resource "azurerm_resource_group" "rg" {
   location = var.resource_group_location
   name     = random_pet.rg_name.id
   tags = var.tags
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "random_id" "log_analytics_workspace_name_suffix" {
@@ -18,6 +23,11 @@ resource "azurerm_log_analytics_workspace" "test" {
   resource_group_name = azurerm_resource_group.rg.name
   sku                 = var.log_analytics_workspace_sku
   tags = var.tags
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_log_analytics_solution" "test" {
@@ -31,6 +41,11 @@ resource "azurerm_log_analytics_solution" "test" {
   plan {
     product   = var.azurerm_log_analytics_solution_plan_product
     publisher = var.azurerm_log_analytics_solution_plan_publisher
+  }
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
   }
 }
 
@@ -64,5 +79,11 @@ resource "azurerm_kubernetes_cluster" "k8s" {
   }
   api_server_access_profile {
     subnet_id = var.vnet_subnet_id
+    vnet_integration_enabled = true
+  }
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
   }
 }
