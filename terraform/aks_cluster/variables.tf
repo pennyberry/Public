@@ -76,3 +76,9 @@ variable "ssh_public_key" {
   default = "~/.ssh/id_rsa.pub"
 }
 variable "vnet_subnet_id" {}
+variable "virtual_network_name" {}
+variable "subnet_name" {
+  default = "AKS-Subnet"
+}
+variable "subnet_address_prefixes" {}
+variable "subnet_resource_group_name" {}

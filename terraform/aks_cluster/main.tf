@@ -12,6 +12,12 @@ resource "azurerm_resource_group" "rg" {
     ]
   }
 }
+resource "azurerm_subnet" "subnet" {
+  virtual_network_name = var.virtual_network_name
+  name = var.subnet_name
+  address_prefixes = var.subnet_address_prefixes
+  resource_group_name = var.subnet_resource_group_name
+}
 
 resource "random_id" "log_analytics_workspace_name_suffix" {
   byte_length = 8
@@ -72,13 +78,15 @@ resource "azurerm_kubernetes_cluster" "k8s" {
   network_profile {
     network_plugin    = var.azurerm_kubernetes_cluster_network_profile_network_plugin
     load_balancer_sku = var.azurerm_kubernetes_cluster_network_profile_load_balancer_sku
+    service_cidr = var.subnet_address_prefixes
+    pod_cidr = var.subnet_address_prefixes
   }
   service_principal {
     client_id     = var.aks_service_principal_app_id
     client_secret = var.aks_service_principal_client_secret
   }
   api_server_access_profile {
-    subnet_id = var.vnet_subnet_id
+    subnet_id = azurerm_subnet.subnet.id
     vnet_integration_enabled = true
   }
   lifecycle {
