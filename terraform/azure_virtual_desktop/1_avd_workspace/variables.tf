@@ -22,7 +22,7 @@ variable "resource_group_location" {
 
     variable "rfc3339" {
     type        = string
-    default     = "2023-03-04T12:43:13Z"
+    default     = "2023-05-04T12:43:13Z"
     description = "Registration token expiration"
     }
 
