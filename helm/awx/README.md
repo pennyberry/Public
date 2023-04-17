@@ -65,3 +65,4 @@ Instead of CR, we use `helm repo index` to generate an index from all locally pu
 Not using CR could be addressed in the future by keeping the chart built as a part of releases, as long as CR compares the chart to previous release packages rather than previous commits. If the latter is the case, then we would not have the necessary history for comparison.
 
 
+helm install jenkins jenkins/jenkins 

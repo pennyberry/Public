@@ -1,0 +1,1 @@
+kubectl exec -n jenkins jenkins-0 -- /bin/cat /run/secrets/additional/chart-admin-password && echo
