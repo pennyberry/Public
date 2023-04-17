@@ -67,45 +67,23 @@ resource "azurerm_virtual_desktop_workspace_application_group_association" "ws-d
 
 resource "random_uuid" "example" {}
 
-resource "azurerm_role_definition" "example" {
-  name        = "AVD-AutoScale"
-  scope       = azurerm_resource_group.sh.id
-  description = "AVD AutoScale Role"
-  permissions {
-    actions = [
-      "Microsoft.Insights/eventtypes/values/read",
-      "Microsoft.Compute/virtualMachines/deallocate/action",
-      "Microsoft.Compute/virtualMachines/restart/action",
-      "Microsoft.Compute/virtualMachines/powerOff/action",
-      "Microsoft.Compute/virtualMachines/start/action",
-      "Microsoft.Compute/virtualMachines/read",
-      "Microsoft.DesktopVirtualization/hostpools/read",
-      "Microsoft.DesktopVirtualization/hostpools/write",
-      "Microsoft.DesktopVirtualization/hostpools/sessionhosts/read",
-      "Microsoft.DesktopVirtualization/hostpools/sessionhosts/write",
-      "Microsoft.DesktopVirtualization/hostpools/sessionhosts/usersessions/delete",
-      "Microsoft.DesktopVirtualization/hostpools/sessionhosts/usersessions/read",
-      "Microsoft.DesktopVirtualization/hostpools/sessionhosts/usersessions/sendMessage/action",
-      "Microsoft.DesktopVirtualization/hostpools/sessionhosts/usersessions/read"
-    ]
-    not_actions = []
-  }
-  assignable_scopes = [
-    azurerm_resource_group.sh.id,
-  ]
-}
 data "azuread_service_principal" "example" {
   application_id = "9cdead84-a844-4324-93f2-b2e6bb768d07"
+}
+
+data "azurerm_role_definition" "role_definition" {
+    name = "Desktop Virtualization Power On Off Contributor"
 }
 
 resource "azurerm_role_assignment" "example" {
   depends_on                       = [azurerm_virtual_desktop_host_pool.hostpool, azurerm_virtual_desktop_workspace.workspace]
   name                             = random_uuid.example.result
   scope                            = azurerm_resource_group.sh.id
-  role_definition_id               = azurerm_role_definition.example.role_definition_resource_id
+  role_definition_id               = data.azurerm_role_definition.role_definition.role_definition_id
   principal_id                     = data.azuread_service_principal.example.id
   skip_service_principal_aad_check = true
 }
+
 
 resource "azurerm_virtual_desktop_scaling_plan" "example" {
   depends_on          = [azurerm_virtual_desktop_host_pool.hostpool, azurerm_virtual_desktop_workspace.workspace, azurerm_role_assignment.example]
