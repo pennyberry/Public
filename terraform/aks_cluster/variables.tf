@@ -7,7 +7,7 @@ variable "tags" {
 }
 
 variable "agent_count" {
-  default = 3
+  default = 2
 }
 
 variable "aks_service_principal_app_id" {}
