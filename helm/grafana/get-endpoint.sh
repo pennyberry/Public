@@ -1,0 +1,1 @@
+kubectl get endpoints -n grafana
