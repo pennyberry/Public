@@ -9,3 +9,13 @@
 #connect to aks cluster 
 #e.g. az aks get-credentials --resource-group rg-subtle-zebra --name k8stest
 kustomize build . | kubectl apply -f -
+
+#wait about 3-4 minutes
+#check logs
+# . watch-logs.sh
+
+#get default creds
+#username : admin
+
+#password
+# . get-awx-password.sh
