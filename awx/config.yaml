@@ -1,0 +1,11 @@
+---
+apiVersion: awx.ansible.com/v1beta1
+kind: AWX
+metadata:
+  name: awx-demo
+spec:
+  service_type: ClusterIP
+  ingress_type: ingress
+  hostname: awx-demo.example.com
+  ingress_annotations: |
+    environment: testing
