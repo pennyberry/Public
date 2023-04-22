@@ -127,3 +127,13 @@ PROTECTED_SETTINGS
     azurerm_virtual_machine_extension.domain_join
   ]
 }
+
+resource "azurerm_virtual_machine_extension" "scripts" {
+  count                = var.rdsh_count
+  name                 = "scripts_extension"
+  virtual_machine_id   = azurerm_windows_virtual_machine.avd_vm.*.id[count.index]
+  publisher            = "Microsoft.Compute"
+  type                 = "CustomScriptExtension"
+  type_handler_version = "1.10"
+  settings = jsonencode({"commandToExecute": var.extensionsettings})
+}
