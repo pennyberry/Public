@@ -54,8 +54,8 @@ resource "azurerm_windows_virtual_machine" "avd_vm" {
 
   source_image_reference {
     publisher = "MicrosoftWindowsDesktop"
-    offer     = "Windows-11"
-    sku       = "win11-22h2-avd"
+    offer     = "office-365"
+    sku       = "win11-22h2-avd-m365"
     version   = "latest"
     #az vm image list --output table --all --publisher MicrosoftWindowsDesktop
   }
