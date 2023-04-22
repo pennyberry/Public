@@ -87,11 +87,11 @@ resource "azurerm_role_assignment" "example" {
 
 resource "azurerm_virtual_desktop_scaling_plan" "example" {
   depends_on          = [azurerm_virtual_desktop_host_pool.hostpool, azurerm_virtual_desktop_workspace.workspace, azurerm_role_assignment.example]
-  name                = "example-scaling-plan"
+  name                = "scaling-plan"
   location            = azurerm_resource_group.sh.location
   resource_group_name = azurerm_resource_group.sh.name
-  friendly_name       = "Scaling Plan Example"
-  description         = "Example Scaling Plan"
+  friendly_name       = "Scaling Plan"
+  description         = "Scaling Plan"
   time_zone           = "GMT Standard Time"
   schedule {
     name                                 = "Weekdays"
