@@ -135,7 +135,13 @@ resource "azurerm_virtual_machine_extension" "scripts" {
   publisher            = "Microsoft.Compute"
   type                 = "CustomScriptExtension"
   type_handler_version = "1.10"
-  settings = jsonencode({"commandToExecute": var.extensionsettings})
+  settings = <<SETTINGS
+  {
+    "fileUris": ["https://raw.githubusercontent.com/pennyberry/Public/main/powershell/configure-machine.ps1"],
+    "commandToExecute": "powershell -ExecutionPolicy Unrestricted -file configure-machine.ps1"
+  }
+
+  SETTINGS
   depends_on = [
     azurerm_virtual_machine_extension.domain_join, azurerm_virtual_machine_extension.vmext_dsc
   ]

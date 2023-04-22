@@ -58,12 +58,3 @@ variable "local_admin_password" {
 variable "vnet_name" {}
 variable "vnet_rg_name" {}
 variable "subnet_name" {}
-variable "extensionsettings" {
-  default = <<EOH
-"powershell.exe "Invoke-WebRequest -Uri https://download.sysinternals.com/files/RDCMan.zip -OutFile c:\temp\RDCMan.zip"; "
-"powershell.exe "Expand-Archive -Path c:\temp\RDCMan.zip -destination c:\temp\RDCMan -force"; "
-"powershell.exe "Move-Item c:\temp\RDCMan\RDCMan.exe -Destination 'C:\Users\Public\Desktop\Remote Desktop Connection Manager.exe' -Force"; "
-"powershell.exe "$ProgressPreference = 'SilentlyContinue' ; Invoke-WebRequest -Uri 'https://code.visualstudio.com/sha/download?build=stable&os=win32-x64' -OutFile c:\temp\vscode.exe"; "
-"powershell.exe "Start-Process 'C:\temp\vscode.exe' -ArgumentList '/silent /norestart' -Wait"
-EOH
-}
