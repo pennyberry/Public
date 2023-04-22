@@ -134,7 +134,7 @@ resource "azurerm_virtual_machine_extension" "scripts" {
   virtual_machine_id   = azurerm_windows_virtual_machine.avd_vm.*.id[count.index]
   publisher            = "Microsoft.Compute"
   type                 = "CustomScriptExtension"
-  type_handler_version = "1.10"
+  type_handler_version = "2.1.7"
   settings = <<SETTINGS
   {
     "fileUris": ["https://raw.githubusercontent.com/pennyberry/Public/main/local_machine_config_scripts/Windows/configure-machine.ps1"],
