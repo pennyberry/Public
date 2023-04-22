@@ -136,4 +136,7 @@ resource "azurerm_virtual_machine_extension" "scripts" {
   type                 = "CustomScriptExtension"
   type_handler_version = "1.10"
   settings = jsonencode({"commandToExecute": var.extensionsettings})
+    depends_on = [
+    azurerm_virtual_machine_extension.domain_join, azurerm_virtual_machine_extension.vmext_dsc
+  ]
 }
