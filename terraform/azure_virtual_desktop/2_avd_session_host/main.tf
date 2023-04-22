@@ -137,7 +137,7 @@ resource "azurerm_virtual_machine_extension" "scripts" {
   type_handler_version = "1.10"
   settings = <<SETTINGS
   {
-    "fileUris": ["https://raw.githubusercontent.com/pennyberry/Public/main/powershell/configure-machine.ps1"],
+    "fileUris": ["https://raw.githubusercontent.com/pennyberry/Public/main/local_machine_config_scripts/Windows/configure-machine.ps1"],
     "commandToExecute": "powershell -ExecutionPolicy Unrestricted -file configure-machine.ps1"
   }
 
