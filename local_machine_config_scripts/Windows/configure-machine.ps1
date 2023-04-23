@@ -18,4 +18,6 @@ if (-Not (get-package "Microsoft Visual Studio Code")) {
     Start-Process 'C:\temp\vscode.exe' -ArgumentList '/silent /norestart'
 }
 
+wsl --install -d ubuntu
+
 stop-transcript
