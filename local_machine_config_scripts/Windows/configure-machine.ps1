@@ -1,5 +1,8 @@
 start-transcript c:\temp\transcript.txt
-Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All
+$hypervstate = (Get-WindowsOptionalFeature -online -FeatureName Microsoft-Hyper-V).State
+if ($hypervstate -ne "Enabled" ) {
+    Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All    
+}
 
 if(-Not (test-path 'C:\Users\Public\Desktop\Remote Desktop Connection Manager.exe')) { 
     Invoke-WebRequest -Uri https://download.sysinternals.com/files/RDCMan.zip -OutFile c:\temp\RDCMan.zip
