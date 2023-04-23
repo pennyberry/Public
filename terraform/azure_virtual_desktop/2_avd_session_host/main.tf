@@ -134,7 +134,7 @@ resource "azurerm_virtual_machine_extension" "scripts" {
   virtual_machine_id   = azurerm_windows_virtual_machine.avd_vm.*.id[count.index]
   publisher            = "Microsoft.Compute"
   type                 = "CustomScriptExtension"
-  type_handler_version = "1.10.15"
+  type_handler_version = "1.10"
   #Get-AzVMExtensionImage -Location eastus -PublisherName microsoft.compute -Type CustomScriptExtension
   settings = <<SETTINGS
   {
