@@ -3,6 +3,10 @@ $hypervstate = (Get-WindowsOptionalFeature -online -FeatureName Microsoft-Hyper-
 if ($hypervstate -ne "Enabled" ) {
     Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All -norestart   
 }
+$adstate = (Get-WindowsCapability -online -Name Rsat.ActiveDirectory.DS-LDS.Tools*).State
+if ($adstate -ne "Installed" ) {
+    Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools*   
+}
 
 if(-Not (test-path 'C:\Users\Public\Desktop\Remote Desktop Connection Manager.exe')) { 
     Invoke-WebRequest -Uri https://download.sysinternals.com/files/RDCMan.zip -OutFile c:\temp\RDCMan.zip
