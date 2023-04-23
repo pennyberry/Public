@@ -1,7 +1,7 @@
 start-transcript c:\temp\transcript.txt
 $hypervstate = (Get-WindowsOptionalFeature -online -FeatureName Microsoft-Hyper-V).State
 if ($hypervstate -ne "Enabled" ) {
-    Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All    
+    Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All -norestart   
 }
 
 if(-Not (test-path 'C:\Users\Public\Desktop\Remote Desktop Connection Manager.exe')) { 
