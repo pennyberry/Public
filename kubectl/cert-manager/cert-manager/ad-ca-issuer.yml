@@ -1,0 +1,17 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: ad-ca-issuer
+spec:
+  ca:
+    secretName: ad-ca-secret
+  auth:
+    basic:
+      username: username
+      passwordSecretRef:
+        name: ad-ca-secret
+        key: password
+  crlDistributionPoints:
+    - http://crl.example.com/ca.crl
+  ocspServers:
+    - http://ocsp.example.com
