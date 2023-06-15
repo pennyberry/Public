@@ -19,3 +19,5 @@ kustomize build . | kubectl apply -f -
 
 #password
 # . get-awx-password.sh
+
+#ip is Azure Portal --> AKS Cluster --> Services and ingresses -->awx-service --> endpoints
