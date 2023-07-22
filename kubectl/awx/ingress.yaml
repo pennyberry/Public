@@ -2,33 +2,33 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: $TLSSECRETNAME
-  namespace: $NAMESPACE
+  name: tls-secret
+  namespace: awx
 data:
-  tls.crt: $BASE64CRT
-  tls.key: $BASE64KEY
+  tls.crt: replace-me-using-patchesStrategicMerge
+  tls.key: replace-me-using-patchesStrategicMerge
 type: kubernetes.io/tls
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: $INGRESSNAME
-  namespace: $NAMESPACE
+  name: awx-ingress
+  namespace: awx
 spec:
   ingressClassName: nginx
   rules:
-    - host: $DNSNAME
+    - host: replace-me-using-patchesStrategicMerge
       http:
         paths:
         - path: /
           pathType: Prefix
           backend:
             service:
-              name: $SERVICENAME
+              name: awx-service
               port:
                 number: 80
 
   tls:
     - hosts:
-      - $DNSNAME
-      secretName: $TLSSECRETNAME
+      - replace-me-using-patchesStrategicMerge
+      secretName: tls-secret

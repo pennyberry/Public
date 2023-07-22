@@ -4,7 +4,8 @@ resources:
   # Find the latest tag here: https://github.com/ansible/awx-operator/releases
   - github.com/ansible/awx-operator/config/default?ref=2.4.0
   - config.yaml
-  - ../../helm/nginx/ingress.yaml
+  - ingress.yaml
+
 
 # Set the image tags to match the git version from above
 images:
@@ -13,3 +14,9 @@ images:
 
 # Specify a custom namespace in which to install AWX
 namespace: awx
+
+# Specify environment variables to replace using yaml inside the replacements directory
+patchesStrategicMerge:
+  - replacements/secret-tls.yaml
+  - replacements/secret-ingress.yaml
+      

@@ -4,4 +4,6 @@
 *.terraform
 *.terraform.*
 terraform.tfvars
-config_variables.yml
+environment-variables.sh
+env-vars.env
+secret*.yaml

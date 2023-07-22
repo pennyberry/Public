@@ -9,6 +9,7 @@
 #connect to aks cluster 
 #e.g. az aks get-credentials --resource-group rg-subtle-zebra --name k8stest
 cd ../../helm/nginx
+namespace=awx
 install.nginx.sh
 cd ../../kubectl/awx
 kubectl apply -k .
