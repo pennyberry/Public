@@ -4,3 +4,4 @@
 *.terraform
 *.terraform.*
 terraform.tfvars
+config_variables.yml
