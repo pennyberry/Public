@@ -2,33 +2,33 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: ingress-tls-secret
-  namespace: awx
+  name: $TLSSECRETNAME
+  namespace: $NAMESPACE
 data:
-  tls.crt: INSERT-CRT-BASE64-TEXT-HERE
-  tls.key: INSERT-KEY-BASE64-TEXT-HERE
+  tls.crt: $BASE64CRT
+  tls.key: $BASE64KEY
 type: kubernetes.io/tls
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: awx-ingress
-  namespace: awx
+  name: $INGRESSNAME
+  namespace: $NAMESPACE
 spec:
   ingressClassName: nginx
   rules:
-    - host: DOMAIN-NAME.DOMAIN.COM
+    - host: $DNSNAME
       http:
         paths:
         - path: /
           pathType: Prefix
           backend:
             service:
-              name: awx-service
+              name: $SERVICENAME
               port:
                 number: 80
 
   tls:
     - hosts:
-      - DOMAIN-NAME.DOMAIN.COM
-      secretName: ingress-tls-secret
+      - $DNSNAME
+      secretName: $TLSSECRETNAME

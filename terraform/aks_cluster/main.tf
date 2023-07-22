@@ -22,6 +22,9 @@ data "azurerm_subnet" "node_pool_subnet" {
   resource_group_name = data.azurerm_virtual_network.vnet.resource_group_name
   virtual_network_name = data.azurerm_virtual_network.vnet.name
 }
+data "azuread_service_principal" "service_principal" {
+  application_id = var.aks_service_principal_app_id
+}
 
 resource "azurerm_subnet" "subnet" {
   virtual_network_name = data.azurerm_virtual_network.vnet.name
@@ -32,6 +35,9 @@ resource "azurerm_subnet" "subnet" {
     name = "delegation"
     service_delegation {
       name = "Microsoft.ContainerService/managedClusters"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action"
+      ]
 
     }
   }
@@ -100,7 +106,7 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     load_balancer_sku = var.azurerm_kubernetes_cluster_network_profile_load_balancer_sku
   }
   service_principal {
-    client_id     = var.aks_service_principal_app_id
+    client_id     = data.azuread_service_principal.service_principal.application_id
     client_secret = var.aks_service_principal_client_secret
   }
   api_server_access_profile {
@@ -115,11 +121,12 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     ]
   }
 }
-resource "azurerm_role_assignment" "vnet_network_contributor" {
-  scope                = data.azurerm_virtual_network.vnet.id
-  role_definition_name = "network contributor"
-  principal_id         = azurerm_kubernetes_cluster.k8s.service_principal[0].client_id
-  depends_on           =[
-                        azurerm_kubernetes_cluster.k8s
-                        ]
-}
+#this seems to break when your spn already has owner privs
+# resource "azurerm_role_assignment" "vnet_network_contributor" {
+#   scope                = data.azurerm_virtual_network.vnet.id
+#   role_definition_name = "network contributor"
+#   principal_id         = data.azuread_service_principal.service_principal.application_id
+#   depends_on           =[
+#                         azurerm_kubernetes_cluster.k8s
+#                         ]
+# }

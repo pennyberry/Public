@@ -4,7 +4,7 @@ resources:
   # Find the latest tag here: https://github.com/ansible/awx-operator/releases
   - github.com/ansible/awx-operator/config/default?ref=2.4.0
   - config.yaml
-  - ingress.yaml
+  - ../../helm/nginx/ingress.yaml
 
 # Set the image tags to match the git version from above
 images:
