@@ -8,7 +8,10 @@
 
 #connect to aks cluster 
 #e.g. az aks get-credentials --resource-group rg-subtle-zebra --name k8stest
-kustomize build . | kubectl apply -f -
+cd ../../helm/nginx
+install.nginx.sh
+cd ../../kubectl/awx
+kubectl apply -k .
 
 #wait about 3-4 minutes
 #check logs

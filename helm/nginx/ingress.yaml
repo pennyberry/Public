@@ -1,0 +1,34 @@
+#after installing NGINX using install-nginx.sh - run this to configure NGINX to route requests to your web service over the given port and TLS secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: INSERT-SECRETNAME-HERE
+  namespace: INSERT-NAMESPACE-NAME-HERE
+data:
+  tls.crt: INSERT-CRT-BASE64-TEXT-HERE
+  tls.key: INSERT-KEY-BASE64-TEXT-HERE
+type: kubernetes.io/tls
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: INSERT-INGRESS-NAME-HERE
+  namespace: INSERT-NAMESPACE-HERE
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: DOMAIN-NAME.DOMAIN.COM
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: INSERT-SERVICE-NAME-HERE
+              port:
+                number: 80
+
+  tls:
+    - hosts:
+      - DOMAIN-NAME.DOMAIN.COM
+      secretName: INSERT-SECRETNAME-HERE
