@@ -12,11 +12,29 @@ resource "azurerm_resource_group" "rg" {
     ]
   }
 }
+
+data "azurerm_virtual_network" "vnet" {
+  name = var.virtual_network_name
+  resource_group_name = var.vnet_resource_group_name
+}
+data "azurerm_subnet" "node_pool_subnet" {
+  name = var.node_pool_subnet_name
+  resource_group_name = data.azurerm_virtual_network.vnet.resource_group_name
+  virtual_network_name = data.azurerm_virtual_network.vnet.name
+}
+
 resource "azurerm_subnet" "subnet" {
-  virtual_network_name = var.virtual_network_name
+  virtual_network_name = data.azurerm_virtual_network.vnet.name
   name = var.subnet_name
   address_prefixes = var.subnet_address_prefixes
-  resource_group_name = var.subnet_resource_group_name
+  resource_group_name = data.azurerm_virtual_network.vnet.resource_group_name
+  delegation {
+    name = "delegation"
+    service_delegation {
+      name = "Microsoft.ContainerService/managedClusters"
+
+    }
+  }
 }
 
 resource "random_id" "log_analytics_workspace_name_suffix" {
@@ -62,11 +80,13 @@ resource "azurerm_kubernetes_cluster" "k8s" {
   dns_prefix          = var.dns_prefix
   tags = var.tags
 
+
   default_node_pool {
-    name       = var.azurerm_kubernetes_cluste_default_node_pool_name
-    vm_size    = var.azurerm_kubernetes_cluster_default_node_pool_vm_size
-    node_count = var.agent_count
-    vnet_subnet_id = var.vnet_subnet_id
+    name           = var.azurerm_kubernetes_cluste_default_node_pool_name
+    vm_size        = var.azurerm_kubernetes_cluster_default_node_pool_vm_size
+    node_count     = var.agent_count
+    vnet_subnet_id = data.azurerm_subnet.node_pool_subnet.id
+    tags           = var.tags
   }
   linux_profile {
     admin_username = var.azurerm_kubernetes_cluster_linux_profile_admin_username
@@ -78,9 +98,6 @@ resource "azurerm_kubernetes_cluster" "k8s" {
   network_profile {
     network_plugin    = var.azurerm_kubernetes_cluster_network_profile_network_plugin
     load_balancer_sku = var.azurerm_kubernetes_cluster_network_profile_load_balancer_sku
-    # service_cidr = var.aks_address_prefixes
-    # docker_bridge_cidr = var.aks_address_prefixes
-    # dns_service_ip = var.dns_service_ip
   }
   service_principal {
     client_id     = var.aks_service_principal_app_id
@@ -92,7 +109,17 @@ resource "azurerm_kubernetes_cluster" "k8s" {
   }
   lifecycle {
     ignore_changes = [
-      tags
+      tags,
+      kubernetes_version,
+      default_node_pool[0].orchestrator_version
     ]
   }
+}
+resource "azurerm_role_assignment" "vnet_network_contributor" {
+  scope                = data.azurerm_virtual_network.vnet.id
+  role_definition_name = "network contributor"
+  principal_id         = azurerm_kubernetes_cluster.k8s.service_principal[0].client_id
+  depends_on           =[
+                        azurerm_kubernetes_cluster.k8s
+                        ]
 }
