@@ -8,7 +8,7 @@ services:
       ports:
         - "5432:5432"
       volumes:
-        - postgres_data:/var/lib/postgresql/data
+        - ./volumes/keycloak/postgres:/var/lib/postgresql/data
       environment:
         POSTGRES_DB: ${pgdb}
         POSTGRES_USER: keycloak
@@ -43,8 +43,6 @@ services:
       # KC_HTTP_HOST_URL: http://${domainname}:8080/keycloak
       # KC_HTTP_HOST_ADMIN_URL: http://${domainname}:8080/keycloak
       # KC_HOSTNAME_ADMIN_URL: http://${domainname}/keycloak
-      
-      
     command:
       - start
       - --import-realm
