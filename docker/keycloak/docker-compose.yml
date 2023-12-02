@@ -1,0 +1,43 @@
+volumes:
+  postgres_data:
+      driver: local
+
+services:
+  postgres:
+      image: postgres
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+      environment:
+        POSTGRES_DB: keycloak
+        POSTGRES_USER: keycloak
+        POSTGRES_PASSWORD: ${pgpassword}
+  auth:
+    image: quay.io/keycloak/keycloak
+    ports:
+      - "8080:8080"
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: ${pgpassword}
+      KEYCLOAK_ADMIN: ${admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${password}
+      PROXY_ADDRESS_FORWARDING: 'true'
+      KC_HOSTNAME: ${domainname}
+      KC_HOSTNAME_PATH: /keycloak
+      KC_PROXY: edge
+      KC_PROXY_ADDRESS_FORWARDING: 'true'
+      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/fullchain.pem
+      KC_HTTPS_CERTIFICATE_KEEY_FILE: /opt/keycloak/privkey.pem
+      
+    command:
+      - start
+      - --import-realm
+    volumes:
+      - /home/keycloak/realm.json:/opt/keycloak/data/import/realm.json
+      - /etc/letsencrypt/live/${domainname}/fullchain.pem:/opt/keycloak/fullchain.pem
+      - /etc/letsencrypt/live/${domainname}/privkey.pem:/opt/keycloak/privkey.pem
+    depends_on:
+      - postgres
