@@ -4,16 +4,16 @@
 
   database: {
     host: postgres
-    password: ENTER-POSTGRES-PW-HERE
+    password: abcABC123
   }
-  hostname: "example.domain.com"
+  hostname: "social.joeberry.org"
   pictrs: {
     url: "http://pictrs:8080/"
-    api_key: ENTER-POSTGRES-PW-HERE
+    api_key: abcABC123
   }
   email: {
     smtp_server: "postfix:25"
-    smtp_from_address: "noreply@example.domain.com"
+    smtp_from_address: "noreply@social.joeberry.org"
     tls_type: "none"
   }
   federation: {

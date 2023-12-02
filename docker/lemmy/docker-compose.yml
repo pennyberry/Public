@@ -39,7 +39,7 @@ services:
     image:  dessalines/lemmy-ui:latest
     environment:
       - LEMMY_UI_LEMMY_INTERNAL_HOST=lemmy:8536
-      - LEMMY_UI_LEMMY_EXTERNAL_HOST=example.domain.com
+      - LEMMY_UI_LEMMY_EXTERNAL_HOST=${domainname}
       - LEMMY_UI_HTTPS=true
     volumes:
       - ./volumes/lemmy-ui/extra_themes:/app/extra_themes
@@ -56,7 +56,7 @@ services:
     # entrypoint: /sbin/tini -- /usr/local/bin/pict-rs -p /mnt -m 4 --image-format webp
     environment:
       - PICTRS_OPENTELEMETRY_URL=http://otel:4137
-      - PICTRS__API_KEY=ENTER-POSTGRES-PW-HERE
+      - PICTRS__API_KEY=${pgpassword}
       - RUST_LOG=debug
       - RUST_BACKTRACE=full
       - PICTRS__MEDIA__VIDEO_CODEC=vp9
@@ -79,7 +79,7 @@ services:
     hostname: postgres
     environment:
       - POSTGRES_USER=lemmy
-      - POSTGRES_PASSWORD=ENTER-POSTGRES-PW-HERE
+      - POSTGRES_PASSWORD=${pgpassword}
       - POSTGRES_DB=lemmy
     volumes:
       - ./volumes/postgres:/var/lib/postgresql/data:Z
@@ -90,6 +90,6 @@ services:
   postfix:
     image: mwader/postfix-relay
     environment:
-      - POSTFIX_myhostname=example.domain.com
+      - POSTFIX_myhostname=${domainname}
     restart: "always"
     logging: *default-logging

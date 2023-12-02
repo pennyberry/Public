@@ -1,5 +1,12 @@
 mkdir c:\Scripts\WSL\EnableLemmy
-wsl cp /home/joe/example.domain.com/windows/startup-application.ps1 /mnt/c/Scripts/WSL/EnableLemmy/startup-application.ps1
+
+#get env vars
+wsl cat /home/joe/Public/docker/lemmy/wsl/env-vars.env | foreach {
+    $name, $value = $_.split('=')
+    set-content env:\$name $value
+}
+
+wsl cp /home/joe/$env:domainname/windows/startup-application.ps1 /mnt/c/Scripts/WSL/EnableLemmy/startup-application.ps1
 $scriptPath = "C:\Scripts\WSL\EnableLemmy\startup-application.ps1"
 $actionParams = "-ExecutionPolicy Bypass -File $scriptPath"
 $taskAction = New-ScheduledTaskAction -Execute 'pwsh.exe' -Argument $actionParams
