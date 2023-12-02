@@ -5,10 +5,12 @@ volumes:
 services:
   postgres:
       image: postgres
+      ports:
+        - "5432:5432"
       volumes:
         - postgres_data:/var/lib/postgresql/data
       environment:
-        POSTGRES_DB: keycloak
+        POSTGRES_DB: ${pgdb}
         POSTGRES_USER: keycloak
         POSTGRES_PASSWORD: ${pgpassword}
   auth:
@@ -18,19 +20,30 @@ services:
     environment:
       DB_VENDOR: POSTGRES
       DB_ADDR: postgres
-      DB_DATABASE: keycloak
+      DB_DATABASE: ${pgdb}
       DB_USER: keycloak
       DB_SCHEMA: public
       DB_PASSWORD: ${pgpassword}
+      DB_URL: jdbc:postgresql://postgres/${pgdb}
       KEYCLOAK_ADMIN: ${admin}
       KEYCLOAK_ADMIN_PASSWORD: ${password}
-      PROXY_ADDRESS_FORWARDING: 'true'
-      KC_HOSTNAME: ${domainname}
+      KC_HOSTNAME_STRICT: 'false'
       KC_HOSTNAME_PATH: /keycloak
+      # KC_HOSTNAME: ${domainname}
+      # KC_HOSTNAME_ADMIN: ${domainname}
+      # KC_HOSTNAME_URL: https://${domainname}/keycloak
+      # KC_HOSTNAME_DEBUG: 'true'
       KC_PROXY: edge
-      KC_PROXY_ADDRESS_FORWARDING: 'true'
-      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/fullchain.pem
-      KC_HTTPS_CERTIFICATE_KEEY_FILE: /opt/keycloak/privkey.pem
+      # KC_PROXY_ADDRESS_FORWARDING: 'true'
+      # KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/fullchain.pem
+      # KC_HTTPS_CERTIFICATE_KEEY_FILE: /opt/keycloak/privkey.pem
+      KC_HTTP_ENABLED: 'true'
+      KC_HTTP_RELATIVE_PATH: /keycloak
+      # KC_HTTP_HOST: ${domainname}
+      # KC_HTTP_HOST_URL: http://${domainname}:8080/keycloak
+      # KC_HTTP_HOST_ADMIN_URL: http://${domainname}:8080/keycloak
+      # KC_HOSTNAME_ADMIN_URL: http://${domainname}/keycloak
+      
       
     command:
       - start
