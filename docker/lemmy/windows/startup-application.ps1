@@ -14,7 +14,7 @@ netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=443 connec
 netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=80 connectaddress=$wsl_ip connectport=80
 
 #startup app inside wsl
-wsl.exe docker-compose -f /home/joe/social.joeberry.org/docker-compose.yml up -d
+wsl.exe docker-compose --env-file /home/joe/Public/docker/lemmy/env-vars.env -f /home/joe/Public/docker/lemmy/docker-compose.yml up -d
 wsl.exe docker-compose --env-file /home/joe/Public/docker/keycloak/env-vars.env -f /home/joe/Public/docker/keycloak/docker-compose.yml up -d
 wsl.exe sleep 8
 #wget https://raw.githubusercontent.com/LemmyNet/lemmy-ansible/main/templates/nginx.conf
