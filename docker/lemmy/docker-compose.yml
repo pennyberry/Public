@@ -29,6 +29,8 @@ services:
     logging: *default-logging
     environment:
       - RUST_LOG="warn"
+      - POSTGRES_PASSWORD=${pgpassword}
+    command: 
     volumes:
       - /home/joe/Public/docker/lemmy/lemmy.hjson:/config/config.hjson:Z
     depends_on:
