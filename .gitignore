@@ -10,3 +10,4 @@ secret*.yaml
 lemmy.hjson
 db
 volumes/
+*.secrets

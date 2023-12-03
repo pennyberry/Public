@@ -1,0 +1,22 @@
+version: "2"
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    environment:
+      - VIRTUAL_HOST=${domainname}
+      - VIRTUAL_PORT=9000
+    ports:
+      - "9443:9443"
+      - "8000:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/joe/Public/docker/portainer/volumes/portainer_data:/data
+      - /etc/letsencrypt/live/${domainname}/privkey.pem:/certs/portainer.key
+      - /etc/letsencrypt/live/${domainname}/fullchain.pem:/certs/portainer.crt
+      - /home/joe/Public/docker/portainer/portainer_password.secrets:/tmp/portainer_password
+    command:
+      --sslcert /certs/portainer.crt
+      --sslkey /certs/portainer.key
+      --admin-password-file /tmp/portainer_password
