@@ -1,0 +1,24 @@
+{
+  # for more info about the config, check out the documentation
+  # https://join-lemmy.org/docs/en/administration/configuration.html
+
+  database: {
+    host: postgres
+    password: enter_pg_pw_here
+  }
+  hostname: "your-domain.com"
+  pictrs: {
+    url: "http://pictrs:8080/"
+    api_key: enter_pg_pw_here
+  }
+  email: {
+    smtp_server: "postfix:25"
+    smtp_from_address: "noreply@your-domain.com"
+    tls_type: "none"
+  }
+  federation: {
+  enabled: true
+  tls_enabled: true
+  allowed_instances: lemmy.ml,lemmy.world,sh.itjust.works
+  }
+}
