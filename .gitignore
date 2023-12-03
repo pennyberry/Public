@@ -9,3 +9,4 @@ env-vars.env
 secret*.yaml
 lemmy.hjson
 db
+volumes/
