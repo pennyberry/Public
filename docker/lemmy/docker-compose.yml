@@ -93,5 +93,5 @@ services:
     image: mwader/postfix-relay
     environment:
       - POSTFIX_myhostname=${domainname}
-    restart: "always"
+    restart: always
     logging: *default-logging

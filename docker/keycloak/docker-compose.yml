@@ -14,10 +14,12 @@ services:
         POSTGRES_DB: ${pgdb}
         POSTGRES_USER: ${pgdb}
         POSTGRES_PASSWORD: ${pgpassword}
+      restart: always
   auth:
     image: quay.io/keycloak/keycloak
     ports:
       - "8080:8080"
+    restart: always
     environment:
       KC_DB: postgres
       DB_DATABASE: ${pgdb}
