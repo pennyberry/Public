@@ -48,7 +48,9 @@ services:
       # KC_HOSTNAME_ADMIN_URL: http://${domainname}/keycloak
     command:
       - start
+      - --import-realm
     volumes:
+      #you need to manually create the realm to pre-seed it. dumb.. i know..
       - /home/joe/Public/docker/keycloak/volumes/realm.json:/opt/keycloak/data/import/realm.json
       - /etc/letsencrypt/live/${domainname}/fullchain.pem:/opt/keycloak/fullchain.pem
       - /etc/letsencrypt/live/${domainname}/privkey.pem:/opt/keycloak/privkey.pem

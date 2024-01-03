@@ -1,6 +1,6 @@
 #wait
 write-host waiting for boot up of wsl
-Wait-Event -Timeout 45
+Wait-Event -Timeout 90
 
 #port forward to wsl
 $wsl_ip = wsl -- ip -o -4 -json addr list eth0 | ConvertFrom-Json | %{ $_.addr_info.local } | ?{ $_ }
