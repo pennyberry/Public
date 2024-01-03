@@ -6,25 +6,25 @@ services:
   postgres:
       image: postgres
       ports:
-        - "5432:5432"
+        #make sure you aren't colliding ports with other containers
+        - "5433:5432"
       volumes:
         - /home/joe/Public/docker/keycloak/volumes/postgres:/var/lib/postgresql/data
       environment:
         POSTGRES_DB: ${pgdb}
-        POSTGRES_USER: keycloak
+        POSTGRES_USER: ${pgdb}
         POSTGRES_PASSWORD: ${pgpassword}
   auth:
     image: quay.io/keycloak/keycloak
     ports:
       - "8080:8080"
     environment:
-      DB_VENDOR: POSTGRES
-      DB_ADDR: postgres
+      KC_DB: postgres
       DB_DATABASE: ${pgdb}
-      DB_USER: keycloak
-      DB_SCHEMA: public
-      DB_PASSWORD: ${pgpassword}
-      DB_URL: jdbc:postgresql://postgres/${pgdb}
+      KC_DB_USERNAME: ${pgdb}
+      KC_DB_SCHEMA: public
+      KC_DB_PASSWORD: ${pgpassword}
+      KC_DB_URL: jdbc:postgresql://postgres/${pgdb}
       KEYCLOAK_ADMIN: ${admin}
       KEYCLOAK_ADMIN_PASSWORD: ${password}
       KC_HOSTNAME_STRICT: 'false'
@@ -34,7 +34,8 @@ services:
       # KC_HOSTNAME_URL: https://${domainname}/keycloak
       # KC_HOSTNAME_DEBUG: 'true'
       KC_PROXY: edge
-      # KC_PROXY_ADDRESS_FORWARDING: 'true'
+      KC_PROXY_ADDRESS_FORWARDING: 'true'
+      KC_FRONTEND_URL: https://${domainname}/keycloak/auth
       # KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/fullchain.pem
       # KC_HTTPS_CERTIFICATE_KEEY_FILE: /opt/keycloak/privkey.pem
       KC_HTTP_ENABLED: 'true'
@@ -45,9 +46,8 @@ services:
       # KC_HOSTNAME_ADMIN_URL: http://${domainname}/keycloak
     command:
       - start
-      - --import-realm
     volumes:
-      - /home/keycloak/realm.json:/opt/keycloak/data/import/realm.json
+      - /home/joe/Public/docker/keycloak/volumes/realm.json:/opt/keycloak/data/import/realm.json
       - /etc/letsencrypt/live/${domainname}/fullchain.pem:/opt/keycloak/fullchain.pem
       - /etc/letsencrypt/live/${domainname}/privkey.pem:/opt/keycloak/privkey.pem
     depends_on:
