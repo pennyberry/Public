@@ -26,15 +26,16 @@ sudo cp /home/joe/Public/hashicorp/vault/vault.hcl /etc/vault.d/vault.hcl
 
 #service
 systemctl daemon-reload
+sudo systemctl enable vault
 service vault start
 
 #init
 export VAULT_ADDR=https://${domainname}:8200
 export VAULT_CACERT="/opt/vault/tls/tls.crt"
-vault operator init > key.secrets
-vault operator unseal $(grep "Unseal Key" key.secrets | awk 'NR==1 {print $NF}')
-vault operator unseal $(grep "Unseal Key" key.secrets | awk 'NR==2 {print $NF}')
-vault operator unseal $(grep "Unseal Key" key.secrets | awk 'NR==3 {print $NF}')
+vault operator init > /home/joe/Public/hashicorp/vault/key.secrets
+vault operator unseal $(grep "Unseal Key" /home/joe/Public/hashicorp/vault/key.secrets | awk 'NR==1 {print $NF}')
+vault operator unseal $(grep "Unseal Key" /home/joe/Public/hashicorp/vault/key.secrets | awk 'NR==2 {print $NF}')
+vault operator unseal $(grep "Unseal Key" /home/joe/Public/hashicorp/vault/key.secrets | awk 'NR==3 {print $NF}')
 
 #login
-vault login $(grep "Initial Root Token" key.secrets | awk 'NR==1 {print $NF}')
+vault login $(grep "Initial Root Token" /home/joe/Public/hashicorp/vault/key.secrets | awk 'NR==1 {print $NF}')
