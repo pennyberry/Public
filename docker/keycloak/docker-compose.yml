@@ -14,12 +14,12 @@ services:
         POSTGRES_DB: ${pgdb}
         POSTGRES_USER: ${pgdb}
         POSTGRES_PASSWORD: ${pgpassword}
-      restart: always
+      restart: unless-stopped
   auth:
     image: quay.io/keycloak/keycloak
     ports:
       - "8080:8080"
-    restart: always
+    restart: unless-stopped
     environment:
       KC_DB: postgres
       DB_DATABASE: ${pgdb}
@@ -48,10 +48,10 @@ services:
       # KC_HOSTNAME_ADMIN_URL: http://${domainname}/keycloak
     command:
       - start
-      - --import-realm
+      #- --import-realm
     volumes:
       #you need to manually create the realm to pre-seed it. dumb.. i know..
-      - /home/joe/Public/docker/keycloak/volumes/realm.json:/opt/keycloak/data/import/realm.json
+      #- /home/joe/Public/docker/keycloak/volumes/realm.json:/opt/keycloak/data/import/realm.json
       - /etc/letsencrypt/live/${domainname}/fullchain.pem:/opt/keycloak/fullchain.pem
       - /etc/letsencrypt/live/${domainname}/privkey.pem:/opt/keycloak/privkey.pem
     depends_on:

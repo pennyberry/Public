@@ -1,4 +1,4 @@
-version: "2"
+version: "3.3"
 services:
   portainer:
     image: portainer/portainer-ce:latest
@@ -15,8 +15,8 @@ services:
       - /home/joe/Public/docker/portainer/volumes/portainer_data:/data
       - /etc/letsencrypt/live/${domainname}/privkey.pem:/certs/portainer.key
       - /etc/letsencrypt/live/${domainname}/fullchain.pem:/certs/portainer.crt
-      - /home/joe/Public/docker/portainer/portainer_password.secrets:/tmp/portainer_password.secrets
+      #- /home/joe/Public/docker/portainer/portainer_password.secrets:/tmp/portainer_password.secrets
     command:
       --sslcert /certs/portainer.crt
       --sslkey /certs/portainer.key
-      --admin-password-file /tmp/portainer_password.secrets
+      --admin-password ${PORTAINERADMINPASSWORD}
