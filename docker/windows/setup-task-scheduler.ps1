@@ -6,6 +6,7 @@ wsl cat /home/joe/Public/docker/lemmy/wsl/env-vars.env | foreach {
     set-content env:\$name $value
 }
 
+#cp /home/joe/Public/docker/windows/startup-application.ps1 /mnt/c/Scripts/WSL/EnableLemmy/startup-application.ps1
 wsl cp /home/joe/Public/docker/windows/startup-application.ps1 /mnt/c/Scripts/WSL/EnableLemmy/startup-application.ps1
 $scriptPath = "C:\Scripts\WSL\EnableLemmy\startup-application.ps1"
 $actionParams = "-ExecutionPolicy Bypass -File $scriptPath"
