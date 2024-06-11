@@ -3,20 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tidal API Search</title>
+<title>Music Land</title>
 <style>
     body {
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
-        background-color: #f0f0f0;
+        background: linear-gradient(45deg, #ff8a00, #e52e71, #007bff, #3f51b5, #673ab7, #ff8a00);
+        background-size: 600% 600%; /* Increase background size for smoother transition */
+        animation: gradientAnimation 10s ease infinite; /* Apply animation for continuous gradient transition */
+    }
+    @keyframes gradientAnimation {
+        0% {background-position: 0% 50%;}
+        50% {background-position: 100% 50%;}
+        100% {background-position: 0% 50%;}
     }
     .container {
         text-align: center;
         padding: 20px;
         border-radius: 5px;
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        background-color: white;
+        background: linear-gradient(45deg, #ff8a00, #e52e71, #007bff, #3f51b5, #673ab7, #ff8a00);
+        background-size: 600% 600%; /* Increase background size for smoother transition */
+        animation: gradientAnimation 10s ease infinite; /* Apply animation for continuous gradient transition */
     }
     input[type="text"] {
         padding: 8px;
@@ -41,6 +50,9 @@
     table {
         border-collapse: collapse;
         width: 100%;
+        background: linear-gradient(45deg, #ff8a00, #e52e71, #007bff, #3f51b5, #673ab7, #ff8a00);
+        background-size: 600% 600%; /* Increase background size for smoother transition */
+        animation: gradientAnimation 10s ease infinite; /* Apply animation for continuous gradient transition */
     }
     th, td {
         border: 1px solid #dddddd;
@@ -48,7 +60,9 @@
         padding: 8px;
     }
     th {
-        background-color: #f2f2f2;
+        background: linear-gradient(45deg, #ff8a00, #e52e71, #007bff, #3f51b5, #673ab7, #ff8a00);
+        background-size: 600% 600%; /* Increase background size for smoother transition */
+        animation: gradientAnimation 10s ease infinite; /* Apply animation for continuous gradient transition */
         cursor: pointer;
     }
     /* Add media query for smaller screens */
@@ -254,7 +268,7 @@
     };
 </script>
 <div class="container">
-    <h2>Tidal API Search</h2>
+    <h2>Music Land</h2>
     <input type="text" id="searchInput" placeholder="Enter search term">
     <button onclick="search()">Search</button>
     <div id="result"></div>
