@@ -223,36 +223,34 @@
         }
     }
 
-    function filterTable() {
-    // Declare variables
-    var input, filter, table, tbody, tr, td, i, txtValue;
-    input = document.getElementById("searchInput");
-    filter = input.value.toUpperCase();
-    table = document.querySelector("table");
-    tbody = table.querySelector("tbody");
-    tr = tbody.getElementsByTagName("tr");
+    const filterTable = () => {
+        const filters = {
+            artist: document.querySelector('#artistFilter').value,
+            title: document.querySelector('#titleFilter').value,
+            album: document.querySelector('#albumFilter').value,
+            trackNumber: document.querySelector('#trackNumberFilter').value,
+            track: document.querySelector('#trackFilter').value
+        };
 
-    // Loop through all table rows, and hide those who don't match the search query
-    for (i = 0; i < tr.length; i++) {
-        var tds = tr[i].getElementsByTagName("td");
-        var found = false;
-        for (var j = 0; j < tds.length; j++) {
-            td = tds[j];
-            if (td) {
-                txtValue = td.textContent || td.innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    found = true;
-                    break;
-                }
-            }
-        }
-        if (found) {
-            tr[i].style.display = "";
-        } else {
-            tr[i].style.display = "none";
-        }
-    }
-    }
+        console.log('Filters:', filters);
+
+        const trs = document.querySelectorAll('#myTableBody tr');
+        const isFoundInTd = (td, filter) => new RegExp(filter, 'i').test(td.innerHTML);
+        const isFound = (childrenArr, filters) => {
+            return (
+                isFoundInTd(childrenArr[0], filters.artist) &&
+                isFoundInTd(childrenArr[1], filters.title) &&
+                isFoundInTd(childrenArr[2], filters.album) &&
+                isFoundInTd(childrenArr[3], filters.trackNumber) &&
+                isFoundInTd(childrenArr[4], filters.track)
+            );
+        };
+        const setTrStyleDisplay = ({ style, children }) => {
+            style.display = isFound([...children], filters) ? '' : 'none';
+        };
+
+        trs.forEach(setTrStyleDisplay);
+    };
 </script>
 <div class="container">
     <h2>Tidal API Search</h2>
