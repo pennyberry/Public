@@ -113,7 +113,7 @@
 
     function fetchTrackDetails(trackId, callback) {
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", `https://corsproxy.io/?https://tidal.401658.xyz/track/?&quality=LOSSLESS&id=${trackId}`, true);
+        xhr.open("GET", `https://corsproxy.io/?https://tidal.401658.xyz/track/?&quality=HI_RES_LOSSLESS&id=${trackId}`, true);
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var trackDetails = JSON.parse(xhr.responseText);
