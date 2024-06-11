@@ -121,6 +121,7 @@ function fetchArtistTracks(artistId) {
                     if (artistResponse[1]) {
                         console.log('Tracks:', artistResponse[1])
                         var tracks = artistResponse[1];
+                        trackList = artistResponse[1];
                         // Loop through each track ID and call fetchTracks()
                         displayResult(tracks);
                     } else {
@@ -214,8 +215,8 @@ function loadTrack(button) {
 function playNextTrack() {
     currentTrackIndex++;
     console.log("Current Track Index:", currentTrackIndex);
-    console.log("TrackList Length:", tracks.length);
-    if (currentTrackIndex < tracks.length) {
+    console.log("TrackList Length:", trackList.length);
+    if (currentTrackIndex < trackList.length) {
         var nextTrackCell = getNextTrackCell(currentTrackIndex);
         if (nextTrackCell) {
             var button = nextTrackCell.querySelector('button');
