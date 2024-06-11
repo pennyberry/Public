@@ -179,8 +179,12 @@
             var nextTrackCell = getNextTrackCell(currentTrackIndex);
             if (nextTrackCell) {
                 var button = nextTrackCell.querySelector('button');
-                console.log('Song Ended, Moving to next song.');
-                button.click();
+                if (button) {
+                    console.log('Song Ended, Moving to next song.');
+                    button.click();
+                } else {
+                    console.error('Button element not found in the next track cell.');
+                }
             } else {
                 // End of the tracklist
                 console.log('End of tracklist');
@@ -190,8 +194,9 @@
             console.log('End of tracklist');
         }
     }
+
     function getNextTrackCell(index) {
-        return document.querySelector(`tr:nth-child(${index + 1})`);
+        return document.querySelector(`tbody tr:nth-child(${index + 1}) .track-cell`);
     }
 
     function sortTable(columnIndex) {
@@ -247,7 +252,7 @@
             tr[i].style.display = "none";
         }
     }
-}
+    }
 </script>
 <div class="container">
     <h2>Tidal API Search</h2>
