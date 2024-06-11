@@ -4,4 +4,5 @@ sudo apt install nginx
 sudo cp /home/joe/Public/docker/nginx/nginx.conf /etc/nginx/sites-enabled/nginx.conf
 sudo rm /var/www/html/index.nginx-debian.html
 sudo cp /home/joe/Public/docker/nginx/index.html /var/www/html/index.html
+sudo cp /home/joe/Public/docker/nginx/index_beta.html /var/www/html/index_beta.html
 sudo service nginx restart

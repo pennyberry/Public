@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Music Land</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(45deg, #ff8a00, #e52e71, #007bff, #3f51b5, #673ab7, #ff8a00);
+        background-size: 600% 600%; /* Increase background size for smoother transition */
+        animation: gradientAnimation 10s ease infinite; /* Apply animation for continuous gradient transition */
+    }
+    @keyframes gradientAnimation {
+        0% {background-position: 0% 50%;}
+        50% {background-position: 100% 50%;}
+        100% {background-position: 0% 50%;}
+    }
+    .container {
+        text-align: center;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        background: linear-gradient(45deg, #ff8a00, #e52e71, #007bff, #3f51b5, #673ab7, #ff8a00);
+        background-size: 600% 600%; /* Increase background size for smoother transition */
+        animation: gradientAnimation 10s ease infinite; /* Apply animation for continuous gradient transition */
+    }
+    input[type="text"] {
+        padding: 8px;
+        margin: 5px;
+        width: calc(100% - 26px); /* Adjust width for mobile */
+    }
+    button {
+        padding: 10px 20px;
+        margin-top: 10px; /* Add margin for mobile */
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #0056b3;
+    }
+    #result {
+        margin-top: 20px;
+        overflow-x: auto;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        background: linear-gradient(45deg, #ff8a00, #e52e71, #007bff, #3f51b5, #673ab7, #ff8a00);
+        background-size: 600% 600%; /* Increase background size for smoother transition */
+        animation: gradientAnimation 10s ease infinite; /* Apply animation for continuous gradient transition */
+    }
+    th, td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    th {
+        background: linear-gradient(45deg, #ff8a00, #e52e71, #007bff, #3f51b5, #673ab7, #ff8a00);
+        background-size: 600% 600%; /* Increase background size for smoother transition */
+        animation: gradientAnimation 10s ease infinite; /* Apply animation for continuous gradient transition */
+        cursor: pointer;
+    }
+    /* Add media query for smaller screens */
+    @media (max-width: 600px) {
+        .container {
+            padding: 10px;
+        }
+        input[type="text"] {
+            width: calc(100% - 18px);
+        }
+    }
+</style>
+</head>
+<body>
+<script>
+    var currentTrackIndex = 0;
+    var trackList = [];
+
+    function search() {
+        var searchTerm = document.getElementById('searchInput').value;
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "https://corsproxy.io/?https://tidal.401658.xyz/search/?s=" + encodeURIComponent(searchTerm), true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        console.log('API Response:', response);  // Log the API response
+                        if (response.items) {
+                            trackList = response.items;
+                            displayResult(trackList);
+                        } else {
+                            console.error('API response does not contain items.');
+                            displayResult([]);  // Call displayResult with an empty array
+                        }
+                    } catch (e) {
+                        console.error('Error parsing JSON response:', e);
+                        displayResult([]);  // Call displayResult with an empty array
+                    }
+                } else {
+                    console.error('API request failed with status:', xhr.status);
+                    displayResult([]);  // Call displayResult with an empty array
+                }
+            }
+        };
+        xhr.send();
+    }
+
+    function fetchTrackDetails(trackId, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", `https://corsproxy.io/?https://tidal.401658.xyz/track/?&quality=HI_RES_LOSSLESS&id=${trackId}`, true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var trackDetails = JSON.parse(xhr.responseText);
+                callback(trackDetails);
+            }
+        };
+        xhr.send();
+    }
+
+    function displayResult(items) {
+        // Sort items by album
+        items.sort((a, b) => a.album.title.localeCompare(b.album.title));
+
+        var resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = ''; // Clear previous results
+        if (items.length === 0) {
+            resultDiv.innerHTML = 'No results found.';
+            return;
+        }
+        var table = document.createElement('table');
+        table.innerHTML = `
+            <thead>
+                <tr>
+                    <th><input type="text" id="artistFilter" placeholder="Filter Artist" onkeyup="filterTable()"></th>
+                    <th><input type="text" id="titleFilter" placeholder="Filter Title" onkeyup="filterTable()"></th>
+                    <th><input type="text" id="albumFilter" placeholder="Filter Album" onkeyup="filterTable()"></th>
+                    <th><input type="text" id="trackNumberFilter" placeholder="Filter Track Number" onkeyup="filterTable()"></th>
+                    <th><input type="text" id="trackFilter" placeholder="Filter Track" onkeyup="filterTable()"></th>
+                </tr>
+                <tr>
+                    <th onclick="sortTable(0)">Artist</th>
+                    <th onclick="sortTable(1)">Title</th>
+                    <th onclick="sortTable(2)">Album</th>
+                    <th onclick="sortTable(3)">Track Number</th>
+                    <th onclick="sortTable(4)">Track</th>
+                </tr>
+            </thead>
+            <tbody id="myTableBody">
+            </tbody>
+        `;
+        var tbody = table.querySelector('#myTableBody');
+        items.forEach(function(item) {
+            fetchTrackDetails(item.id, function(trackDetails) {
+                var row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.artist.name}</td>
+                    <td>${item.title}</td>
+                    <td>${item.album.title}</td>
+                    <td>${trackDetails[0].trackNumber}</td>
+                    <td class="track-cell" data-src="${trackDetails[2].OriginalTrackUrl}">
+                        <button onclick="loadTrack(this)">Load Track</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+        resultDiv.appendChild(table);
+    }
+
+    function loadTrack(button) {
+        var trackCell = button.parentElement;
+        var trackUrl = trackCell.getAttribute('data-src');
+        var video = document.createElement('video');
+        video.controls = true;
+        video.autoplay = true;
+        video.name = 'media';
+        video.innerHTML = `<source src="${trackUrl}" type="audio/flac">`;
+        trackCell.innerHTML = '';
+        trackCell.appendChild(video);
+        video.addEventListener('ended', playNextTrack);
+    }
+
+    function playNextTrack() {
+        currentTrackIndex++;
+        console.log("Current Track Index:", currentTrackIndex);
+        console.log("TrackList Length:", trackList.length);
+        if (currentTrackIndex < trackList.length) {
+            var nextTrackCell = getNextTrackCell(currentTrackIndex);
+            if (nextTrackCell) {
+                var button = nextTrackCell.querySelector('button');
+                if (button) {
+                    console.log('Song Ended, Moving to next song.');
+                    button.click();
+                } else {
+                    console.error('Button element not found in the next track cell.');
+                }
+            } else {
+                // End of the tracklist
+                console.log('End of tracklist');
+            }
+        } else {
+            // End of the tracklist
+            console.log('End of tracklist');
+        }
+    }
+
+    function getNextTrackCell(index) {
+        return document.querySelector(`tbody tr:nth-child(${index + 1}) .track-cell`);
+    }
+
+    function sortTable(columnIndex) {
+        var table, rows, switching, i, shouldSwitch;
+        table = document.querySelector('table');
+        if (!table) return; // Check if table exists
+        switching = true;
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                var x = rows[i].getElementsByTagName("td")[columnIndex];
+                var y = rows[i + 1].getElementsByTagName("td")[columnIndex];
+                if (x && y && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
+        }
+    }
+
+    const filterTable = () => {
+        const filters = {
+            artist: document.querySelector('#artistFilter').value,
+            title: document.querySelector('#titleFilter').value,
+            album: document.querySelector('#albumFilter').value,
+            trackNumber: document.querySelector('#trackNumberFilter').value,
+            track: document.querySelector('#trackFilter').value
+        };
+
+        console.log('Filters:', filters);
+
+        const trs = document.querySelectorAll('#myTableBody tr');
+        const isFoundInTd = (td, filter) => new RegExp(filter, 'i').test(td.innerHTML);
+        const isFound = (childrenArr, filters) => {
+            return (
+                isFoundInTd(childrenArr[0], filters.artist) &&
+                isFoundInTd(childrenArr[1], filters.title) &&
+                isFoundInTd(childrenArr[2], filters.album) &&
+                isFoundInTd(childrenArr[3], filters.trackNumber) &&
+                isFoundInTd(childrenArr[4], filters.track)
+            );
+        };
+        const setTrStyleDisplay = ({ style, children }) => {
+            style.display = isFound([...children], filters) ? '' : 'none';
+        };
+
+        trs.forEach(setTrStyleDisplay);
+    };
+</script>
+<div class="container">
+    <h2>Music Land</h2>
+    <input type="text" id="searchInput" placeholder="Enter search term">
+    <button onclick="search()">Search</button>
+    <div id="result"></div>
+</div>
+</body>
+</html>
