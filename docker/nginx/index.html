@@ -214,8 +214,8 @@ function loadTrack(button) {
 function playNextTrack() {
     currentTrackIndex++;
     console.log("Current Track Index:", currentTrackIndex);
-    console.log("TrackList Length:", trackList.length);
-    if (currentTrackIndex < trackList.length) {
+    console.log("TrackList Length:", tracks.length);
+    if (currentTrackIndex < tracks.length) {
         var nextTrackCell = getNextTrackCell(currentTrackIndex);
         if (nextTrackCell) {
             var button = nextTrackCell.querySelector('button');
