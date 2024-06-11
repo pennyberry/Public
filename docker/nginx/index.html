@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tidal API Search</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f0f0f0;
+    }
+    .container {
+        text-align: center;
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translate(-50%, 0);
+        z-index: 1;
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    input[type="text"] {
+        padding: 8px;
+        margin: 5px;
+        width: 200px;
+    }
+    button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #0056b3;
+    }
+    #result {
+        margin-top: 20px;
+        overflow-x: auto;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    th, td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    th {
+        background-color: #f2f2f2;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+<script>
+    var currentTrackIndex = 0;
+    var trackList = [];
+
+    function search() {
+        var searchTerm = document.getElementById('searchInput').value;
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "https://corsproxy.io/?https://tidal.401658.xyz/search/?s=" + encodeURIComponent(searchTerm), true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        console.log('API Response:', response);  // Log the API response
+                        if (response.items) {
+                            trackList = response.items;
+                            displayResult(trackList);
+                        } else {
+                            console.error('API response does not contain items.');
+                            displayResult([]);  // Call displayResult with an empty array
+                        }
+                    } catch (e) {
+                        console.error('Error parsing JSON response:', e);
+                        displayResult([]);  // Call displayResult with an empty array
+                    }
+                } else {
+                    console.error('API request failed with status:', xhr.status);
+                    displayResult([]);  // Call displayResult with an empty array
+                }
+            }
+        };
+        xhr.send();
+    }
+
+    function fetchTrackDetails(trackId, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", `https://corsproxy.io/?https://tidal.401658.xyz/track/?&quality=LOSSLESS&id=${trackId}`, true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var trackDetails = JSON.parse(xhr.responseText);
+                callback(trackDetails);
+            }
+        };
+        xhr.send();
+    }
+
+    function displayResult(items) {
+        // Sort items by album
+        items.sort((a, b) => a.album.title.localeCompare(b.album.title));
+
+        var resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = ''; // Clear previous results
+        if (items.length === 0) {
+            resultDiv.innerHTML = 'No results found.';
+            return;
+        }
+        var table = document.createElement('table');
+        table.innerHTML = `
+            <thead>
+                <tr>
+                    <th><input type="text" id="artistFilter" placeholder="Filter Artist" onkeyup="filterTable()"></th>
+                    <th><input type="text" id="titleFilter" placeholder="Filter Title" onkeyup="filterTable()"></th>
+                    <th><input type="text" id="albumFilter" placeholder="Filter Album" onkeyup="filterTable()"></th>
+                    <th><input type="text" id="trackNumberFilter" placeholder="Filter Track Number" onkeyup="filterTable()"></th>
+                    <th><input type="text" id="trackFilter" placeholder="Filter Track" onkeyup="filterTable()"></th>
+                </tr>
+                <tr>
+                    <th onclick="sortTable(0)">Artist</th>
+                    <th onclick="sortTable(1)">Title</th>
+                    <th onclick="sortTable(2)">Album</th>
+                    <th onclick="sortTable(3)">Track Number</th>
+                    <th onclick="sortTable(4)">Track</th>
+                </tr>
+            </thead>
+            <tbody id="myTableBody">
+            </tbody>
+        `;
+        var tbody = table.querySelector('#myTableBody');
+        items.forEach(function(item) {
+            fetchTrackDetails(item.id, function(trackDetails) {
+                var row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.artist.name}</td>
+                    <td>${item.title}</td>
+                    <td>${item.album.title}</td>
+                    <td>${trackDetails[0].trackNumber}</td>
+                    <td class="track-cell" data-src="${trackDetails[2].OriginalTrackUrl}">
+                        <button onclick="loadTrack(this)">Load Track</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+        resultDiv.appendChild(table);
+    }
+
+    function loadTrack(button) {
+        var trackCell = button.parentElement;
+        var trackUrl = trackCell.getAttribute('data-src');
+        var video = document.createElement('video');
+        video.controls = true;
+        video.autoplay = true;
+        video.name = 'media';
+        video.innerHTML = `<source src="${trackUrl}" type="audio/flac">`;
+        trackCell.innerHTML = '';
+        trackCell.appendChild(video);
+        video.addEventListener('ended', playNextTrack);
+    }
+
+    function playNextTrack() {
+        currentTrackIndex++;
+        console.log("Current Track Index:", currentTrackIndex);
+        console.log("TrackList Length:", trackList.length);
+        if (currentTrackIndex < trackList.length) {
+            var nextTrackCell = getNextTrackCell(currentTrackIndex);
+            if (nextTrackCell) {
+                var button = nextTrackCell.querySelector('button');
+                console.log('Song Ended, Moving to next song.');
+                button.click();
+            } else {
+                // End of the tracklist
+                console.log('End of tracklist');
+            }
+        } else {
+            // End of the tracklist
+            console.log('End of tracklist');
+        }
+    }
+    function getNextTrackCell(index) {
+        return document.querySelector(`tr:nth-child(${index + 1})`);
+    }
+
+    function sortTable(columnIndex) {
+        var table, rows, switching, i, shouldSwitch;
+        table = document.querySelector('table');
+        if (!table) return; // Check if table exists
+        switching = true;
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                var x = rows[i].getElementsByTagName("td")[columnIndex];
+                var y = rows[i + 1].getElementsByTagName("td")[columnIndex];
+                if (x && y && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
+        }
+    }
+
+    function filterTable() {
+    // Declare variables
+    var input, filter, table, tbody, tr, td, i, txtValue;
+    input = document.getElementById("searchInput");
+    filter = input.value.toUpperCase();
+    table = document.querySelector("table");
+    tbody = table.querySelector("tbody");
+    tr = tbody.getElementsByTagName("tr");
+
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+        var tds = tr[i].getElementsByTagName("td");
+        var found = false;
+        for (var j = 0; j < tds.length; j++) {
+            td = tds[j];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (found) {
+            tr[i].style.display = "";
+        } else {
+            tr[i].style.display = "none";
+        }
+    }
+}
+</script>
+<div class="container">
+    <h2>Tidal API Search</h2>
+    <input type="text" id="searchInput" placeholder="Enter search term">
+    <button onclick="search()">Search</button>
+    <div id="result"></div>
+</div>
+</body>
+</html>

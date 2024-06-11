@@ -9,7 +9,7 @@ services:
         #make sure you aren't colliding ports with other containers
         - "5433:5432"
       volumes:
-        - /home/joe/Public/docker/keycloak/volumes/postgres:/var/lib/postgresql/data
+        - ~joe/Public/docker/keycloak/volumes/postgres:/var/lib/postgresql/data
       environment:
         POSTGRES_DB: ${pgdb}
         POSTGRES_USER: ${pgdb}
