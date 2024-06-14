@@ -94,6 +94,7 @@ xhr.onreadystatechange = function () {
                 if (response[0].artists && response[0].artists.items.length > 0) {
                     var sortedArtists = response[0].artists.items.sort((a, b) => b.popularity - a.popularity);
                     var artistId = sortedArtists[0].id;
+                    console.log('Artist ID:', artistId);
                     fetchArtistTracks(artistId);
                 } else {
                     console.error('No artists found for the given search term.');
@@ -122,8 +123,12 @@ function fetchArtistTracks(artistId) {
                         console.log('Tracks:', artistResponse[1])
                         var tracks = artistResponse[1];
                         trackList = artistResponse[1];
+                        // Sort tracks by popularity
+                        tracks.sort((a, b) => b.popularity - a.popularity);
+                        // Get the top 25 most popular tracks
+                        var topTracks = tracks.slice(0, 35);
                         // Loop through each track ID and call fetchTracks()
-                        displayResult(tracks);
+                        displayResult(topTracks);
                     } else {
                         console.error('No artist data found for the given ID.');
                     }
@@ -137,7 +142,6 @@ function fetchArtistTracks(artistId) {
     };
     xhr.send();
 }
-
 function fetchTrackDetails(trackId, callback) {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", `https://corsproxy.io/?https://tidal.401658.xyz/track/?&quality=HI_RES_LOSSLESS&id=${trackId}`, true);
@@ -241,28 +245,36 @@ function getNextTrackCell(index) {
 }
 
 function sortTable(columnIndex) {
-    var table, rows, switching, i, shouldSwitch;
-    table = document.querySelector('table');
-    if (!table) return; // Check if table exists
-    switching = true;
-    while (switching) {
-        switching = false;
-        rows = table.rows;
-        for (i = 1; i < (rows.length - 1); i++) {
-            shouldSwitch = false;
-            var x = rows[i].getElementsByTagName("td")[columnIndex];
-            var y = rows[i + 1].getElementsByTagName("td")[columnIndex];
-            if (x && y && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-                shouldSwitch = true;
-                break;
+        var table, rows, switching, i, shouldSwitch;
+        table = document.querySelector('table');
+        if (!table) return; // Check if table exists
+        switching = true;
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                var x = rows[i].getElementsByTagName("td")[columnIndex];
+                var y = rows[i + 1].getElementsByTagName("td")[columnIndex];
+                if (x && y) {
+                    var xValue = x.innerHTML.toLowerCase();
+                    var yValue = y.innerHTML.toLowerCase();
+                    if (!isNaN(xValue) && !isNaN(yValue)) {
+                        xValue = parseFloat(xValue);
+                        yValue = parseFloat(yValue);
+                    }
+                    if (xValue > yValue) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
             }
         }
-        if (shouldSwitch) {
-            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-            switching = true;
-        }
     }
-}
 
 const filterTable = () => {
     const filters = {
@@ -295,7 +307,7 @@ const filterTable = () => {
 </script>
 <div class="container">
     <h2>Music Land</h2>
-    <input type="text" id="searchInput" placeholder="Enter search term">
+    <input type="text" id="searchInput" placeholder="Search for an artist" onkeyup="if (event.keyCode === 13) { search(); }">
     <button onclick="search()">Search</button>
     <div id="result"></div>
 </div>
