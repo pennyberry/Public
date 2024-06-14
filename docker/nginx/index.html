@@ -90,7 +90,6 @@ xhr.onreadystatechange = function () {
         if (xhr.status === 200) {
             try {
                 var response = JSON.parse(xhr.responseText);
-                console.log('API Response:', response);  // Log the API response
                 if (response[0].artists && response[0].artists.items.length > 0) {
                     var sortedArtists = response[0].artists.items.sort((a, b) => b.popularity - a.popularity);
                     var artistId = sortedArtists[0].id;
