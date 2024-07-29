@@ -1,4 +1,4 @@
-source /home/joe/Public/docker/lemmy/wsl/env-vars.env
+source /home/joe/Public/docker/lemmy/wsl/social/env-vars.env
 sudo apt install certbot
 now=$(date +'%m-%d-%Y--%H-%M')
 domain=${domainname}
