@@ -1,8 +1,9 @@
 services:
   gluetun:
     image: qmcgaw/gluetun
+    network_mode: bridge
     ports:
-      - "8080:8080"
+      - 8080:8080 #qbittorent webUI
     cap_add:
       - NET_ADMIN
     environment:
@@ -17,8 +18,8 @@ services:
     image: qbittorrentofficial/qbittorrent-nox:latest
     container_name: qbittorrent-nox
     environment:
-    - PUID=1004
-    - PGID=1001
+    - PUID=0
+    - PGID=0
     - WEBUI_PORT=8080
     read_only: false
     stop_grace_period: 30m
