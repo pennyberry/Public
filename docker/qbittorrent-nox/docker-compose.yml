@@ -1,12 +1,28 @@
 services:
+  gluetun:
+    image: qmcgaw/gluetun
+    ports:
+      - "8080:8080"
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - VPN_SERVICE_PROVIDER=protonvpn
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=${PRIVATEKEY}
+      - SERVER_COUNTRIES=United States
+      - PORT_FORWARD_ONLY=on
+    restart: unless-stopped
+
   qbittorrent:
     image: qbittorrentofficial/qbittorrent-nox:latest
     container_name: qbittorrent-nox
     environment:
     - PUID=1004
-    - PGID=1001   
+    - PGID=1001
+    - WEBUI_PORT=8080
     read_only: false
     stop_grace_period: 30m
+    network_mode: "service:gluetun"
     tmpfs:
     - /tmp
     volumes:
@@ -14,5 +30,6 @@ services:
     - /home/joe/Public/docker/qbittorrent-nox/volumes/config/gluetun:/config/data_gluetun
     - /home/joe/Public/docker/qbittorrent-nox/volumes/downloads:/mnt/downloads
     restart: unless-stopped
-    ports:
-      - "8080:8080/tcp"
+    depends_on:
+      gluetun:
+        condition: service_healthy
