@@ -1,0 +1,14 @@
+services:
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/joe/Public/docker/sonarr/volumes/data:/config
+      - /home/joe/Public/docker/sonarr/volumes/tv:/tv
+      - /home/joe/Public/docker/sonarr/volumes/downloads:/downloads
+    ports:
+      - 8989:8989
+    restart: unless-stopped
