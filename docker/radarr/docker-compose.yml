@@ -11,3 +11,4 @@ services:
     volumes:
       - /home/joe/Public/docker/radarr/volumes/config:/config
       - /home/joe/Public/docker/radarr/volumes/data:/data
+      - /home/joe/Public/docker/radarr/volumes/downloads:/donwloads
