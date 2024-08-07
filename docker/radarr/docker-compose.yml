@@ -6,10 +6,9 @@ services:
     environment:
       - PUID=0
       - PGID=0
-      - UMASK=002
       - TZ=Etc/UTC
     volumes:
       - /home/joe/Public/docker/radarr/volumes/config:/config
       - /home/joe/Public/docker/radarr/volumes/data:/data
-      - /home/joe/Public/docker/radarr/volumes/downloads:/donwloads
+      - /home/joe/Public/docker/radarr/volumes/movies:/movies
     restart: unless-stopped
