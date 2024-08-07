@@ -13,6 +13,12 @@ services:
       - SERVER_COUNTRIES=United States
       - PORT_FORWARD_ONLY=on
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "ping -c 4 8.8.8.8"]
+      interval: 30s
+      timeout: 20s
+      retries: 5
+      start_period: 15s
 
   qbittorrent:
     image: qbittorrentofficial/qbittorrent-nox:latest
@@ -30,7 +36,6 @@ services:
     - /home/joe/Public/docker/qbittorrent-nox/volumes/config:/config
     - /home/joe/Public/docker/qbittorrent-nox/volumes/config/gluetun:/config/data_gluetun
     - /home/joe/Public/docker/qbittorrent-nox/volumes/downloads:/downloads
-    restart: unless-stopped
     depends_on:
       gluetun:
         condition: service_healthy
