@@ -1,0 +1,12 @@
+services:
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: grafana
+    restart: unless-stopped
+    user: '0'
+    ports:
+      - '3000:3000'
+    volumes:
+      - /home/joe/Public/docker/grafana/volumes/grafana:/var/lib/grafana
+volumes:
+  grafana-storage: {}
