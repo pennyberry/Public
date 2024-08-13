@@ -9,7 +9,7 @@ services:
         #make sure you aren't colliding ports with other containers
         - "5433:5432"
       volumes:
-        - ~joe/Public/docker/keycloak/volumes/postgres:/var/lib/postgresql/data
+        - /home/joe/Public/docker/keycloak/volumes/postgres:/var/lib/postgresql/data
       environment:
         POSTGRES_DB: ${pgdb}
         POSTGRES_USER: ${pgdb}
@@ -18,7 +18,7 @@ services:
   auth:
     image: quay.io/keycloak/keycloak
     ports:
-      - "8080:8080"
+      - "8082:8080"
     restart: unless-stopped
     environment:
       KC_DB: postgres
@@ -30,29 +30,8 @@ services:
       KEYCLOAK_ADMIN: ${admin}
       KEYCLOAK_ADMIN_PASSWORD: ${password}
       KC_HOSTNAME_STRICT: 'false'
-      KC_HOSTNAME_PATH: /keycloak
-      # KC_HOSTNAME: ${domainname}
-      # KC_HOSTNAME_ADMIN: ${domainname}
-      # KC_HOSTNAME_URL: https://${domainname}/keycloak
-      # KC_HOSTNAME_DEBUG: 'true'
-      KC_PROXY: edge
-      KC_PROXY_ADDRESS_FORWARDING: 'true'
-      KC_FRONTEND_URL: https://${domainname}/keycloak/auth
-      # KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/fullchain.pem
-      # KC_HTTPS_CERTIFICATE_KEEY_FILE: /opt/keycloak/privkey.pem
       KC_HTTP_ENABLED: 'true'
-      KC_HTTP_RELATIVE_PATH: /keycloak
-      # KC_HTTP_HOST: ${domainname}
-      # KC_HTTP_HOST_URL: http://${domainname}:8080/keycloak
-      # KC_HTTP_HOST_ADMIN_URL: http://${domainname}:8080/keycloak
-      # KC_HOSTNAME_ADMIN_URL: http://${domainname}/keycloak
     command:
       - start
-      #- --import-realm
-    volumes:
-      #you need to manually create the realm to pre-seed it. dumb.. i know..
-      #- /home/joe/Public/docker/keycloak/volumes/realm.json:/opt/keycloak/data/import/realm.json
-      - /etc/letsencrypt/live/${domainname}/fullchain.pem:/opt/keycloak/fullchain.pem
-      - /etc/letsencrypt/live/${domainname}/privkey.pem:/opt/keycloak/privkey.pem
     depends_on:
       - postgres
