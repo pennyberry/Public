@@ -1,3 +1,7 @@
+###
+#logs for each proxy host are here /data/nginx/proxy_host/<number>.conf
+# 1.conf , 2.conf, etc...
+###
 version: '3.8'
 services:
   app:

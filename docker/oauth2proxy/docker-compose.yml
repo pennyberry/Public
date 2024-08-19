@@ -2,11 +2,15 @@ services:
   oauth2-proxy:
     container_name: oauth2-proxy
     image: quay.io/oauth2-proxy/oauth2-proxy:v7.4.0
-    command: --config /oauth2-proxy.cfg
+    command: --config /etc/oauth2-proxy.cfg
     environment:
       - OAUTH2_PROXY_SKIP_PROVIDER_BUTTON=true
+      - PUID=0
+      - PGID=0
     ports:
       - 4180:4180/tcp
     volumes:
-      - /home/joe/Public/docker/oauth2proxy/volumes/oauth2-proxy.cfg:/oauth2-proxy.cfg
+      - /home/joe/Public/docker/oauth2proxy/volumes/oauth2-proxy.cfg:/etc/oauth2-proxy.cfg
+      - /home/joe/Public/docker/oauth2proxy/volumes/authenticated-emails.cfg:/etc/authenticated-emails.cfg
+      - /home/joe/Public/docker/nginx-proxy-manager/volumes/letsencrypt/:/etc/letsencrypt/
     restart: unless-stopped
