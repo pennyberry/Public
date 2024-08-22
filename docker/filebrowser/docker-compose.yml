@@ -8,3 +8,4 @@ services:
       - /home/joe/Public/docker/filebrowser/volumes/.filebrowser.json:/.filebrowser.json
     ports:
       - 8083:80
+    restart: unless-stopped
