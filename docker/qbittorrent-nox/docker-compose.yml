@@ -12,6 +12,8 @@ services:
       - WIREGUARD_PRIVATE_KEY=${PRIVATEKEY}
       - SERVER_COUNTRIES=United States
       - PORT_FORWARD_ONLY=on
+      - VPN_PORT_FORWARDING_PROVIDER=protonvpn
+      - VPN_PORT_FORWARDING=on
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "ping -c 4 8.8.8.8 || exit 1"]
