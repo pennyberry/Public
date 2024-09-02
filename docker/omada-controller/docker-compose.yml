@@ -1,0 +1,18 @@
+services:
+  omada-controller:
+    image: mbentley/omada-controller:latest
+    container_name: omada-controller
+    network_mode: host
+    volumes:
+      - /home/joe/Public/docker/omada-controller/volumes/data:/opt/tplink/EAPController/data
+      - /home/joe/Public/docker/omada-controller/volumes/work:/opt/tplink/EAPController/work
+      - /home/joe/Public/docker/omada-controller/volumes/logs:/opt/tplink/EAPController/logs
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - MANAGE_HTTP_PORT=8088
+      - PORTAL_HTTP_PORT=8088
+      - SHOW_SERVER_LOGS=true
+      - SHOW_MONGODB_LOGS=false
+    restart: unless-stopped
