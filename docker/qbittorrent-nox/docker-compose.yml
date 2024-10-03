@@ -42,7 +42,7 @@ services:
     - /home/joe/Public/docker/qbittorrent-nox/volumes/config/gluetun:/config/data_gluetun
     - /home/joe/Public/docker/qbittorrent-nox/volumes/downloads:/downloads
     healthcheck:
-      test: ["CMD-SHELL", "ping -c 4 8.8.8.8 || exit 1"]
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:8080/api/v2/transfer/info | grep '\"connection_status\":\"connected\"' || exit 1"]
       interval: 1m30s
       timeout: 30s
       retries: 5
