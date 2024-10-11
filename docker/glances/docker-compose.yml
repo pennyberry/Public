@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  glances:
+    image: nicolargo/glances:latest-full
+    restart: unless-stopped
+    ports:
+      - "61208-61209:61208-61209"
+    environment:
+      - TZ=Etc/UTC
+      - "GLANCES_OPT=-w"
+      - PUID=0
+      - PGID=0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /run/user/1000/podman/podman.sock:/run/user/1000/podman/podman.sock:ro

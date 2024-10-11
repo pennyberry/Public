@@ -3,8 +3,20 @@ volumes:
       driver: local
 
 services:
+  # postgres-new:
+  #     image: postgres
+  #     ports:
+  #       #make sure you aren't colliding ports with other containers
+  #       - "5434:5432"
+  #     volumes:
+  #       - /home/joe/Public/docker/keycloak/volumes/postgres17:/var/lib/postgresql/data
+  #     environment:
+  #       POSTGRES_DB: ${pgdb}
+  #       POSTGRES_USER: ${pgdb}
+  #       POSTGRES_PASSWORD: ${pgpassword}
+  #     restart: unless-stopped
   postgres:
-      image: postgres
+      image: postgres:16
       ports:
         #make sure you aren't colliding ports with other containers
         - "5433:5432"
@@ -35,3 +47,4 @@ services:
       - start
     depends_on:
       - postgres
+      #- postgres-new
