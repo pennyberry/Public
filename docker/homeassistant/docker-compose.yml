@@ -1,0 +1,18 @@
+services:
+  homeassistant:
+    container_name: homeassistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    volumes:
+      - /home/joe/Public/docker/homeassistant/volumes/config:/config
+      - /home/joe/Public/docker/homeassistant/volumes/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+
+# once the container is built, edit your config here
+# /docker/homeassistant/volumes/config/configuration.yaml
+# add this (to get ip range, run "docker network inspect nginx-proxy-manager_default")
+# http:
+#     use_x_forwarded_for: true
+#     trusted_proxies: 172.20.0.0/16
