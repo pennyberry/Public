@@ -12,7 +12,8 @@ services:
 
 # once the container is built, edit your config here
 # /docker/homeassistant/volumes/config/configuration.yaml
-# add this (to get ip range, run "docker network inspect nginx-proxy-manager_default")
+# chmod 777 the configuration.yml in order to edit
+# add this and restart the container (to get ip range, run "docker network inspect nginx-proxy-manager_default")
 # http:
 #     use_x_forwarded_for: true
 #     trusted_proxies: 172.20.0.0/16
