@@ -6,7 +6,7 @@
 
 # The env-vars.env file should look like this:
 # mydomain="yourdomain.com"
-# myhostname="*"
+# myhostname="subdomain"
 # CLOUDFLARE_API_KEY="REDACTED"
 # CLOUDFLARE_EMAIL="REDACTED"
 # ZONE_ID="REDACTED"
