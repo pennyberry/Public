@@ -39,7 +39,7 @@ if [ "$myip" != "$cloudflareip" ]; then
     update_result=$(curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$DNS_RECORD_ID" \
     -H "Authorization: Bearer ${CLOUDFLARE_API_KEY}" \
     -H "Content-Type: application/json" \
-    --data '{"type":"A","name":"'"$myhostname.$mydomain"'","content":"'"$myip"'","ttl":1,"proxied":true}')
+    --data '{"type":"A","name":"'"$myhostname.$mydomain"'","content":"'"$myip"'","ttl":1,"proxied":false}')
     
     if echo "$update_result" | jq -e '.success' > /dev/null; then
         echo "DNS record updated successfully."
