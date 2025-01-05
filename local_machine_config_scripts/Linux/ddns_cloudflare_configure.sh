@@ -5,7 +5,7 @@
 #This script will update the Cloudflare DNS record with the current external IP address of the machine it is running on.
 
 # The env-vars.env file should look like this:
-# mydomain="joeberry.org"
+# mydomain="yourdomain.com"
 # myhostname="*"
 # CLOUDFLARE_API_KEY="REDACTED"
 # CLOUDFLARE_EMAIL="REDACTED"
