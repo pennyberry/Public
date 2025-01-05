@@ -14,6 +14,18 @@
 
 #!/bin/bash
 
+#find your zone id by running the following commands.
+# cloudflarezones=`curl -s https://api.cloudflare.com/client/v4/zones \
+#     -H "Authorization: Bearer ${CLOUDFLARE_API_KEY}"`
+# echo -e "ID\tNAME"
+# echo $cloudflarezones | jq -r '.result[] | [.id, .name] | @tsv'
+
+#find your dns record id by running the following commands.
+# cloudflarednsrecords=`curl -s https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records \
+#     -H "Authorization: Bearer ${CLOUDFLARE_API_KEY}"`
+# echo -e "ID\tNAME\tTYPE\tCONTENT"
+# echo $cloudflarednsrecords | jq -r '.result[] | [.id, .name, .type, .content] | @tsv'
+
 source env-vars.env
 
 myip=`curl -s "https://api.ipify.org"`
