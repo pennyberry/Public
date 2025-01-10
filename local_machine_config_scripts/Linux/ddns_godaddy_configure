@@ -1,3 +1,4 @@
+#!/bin/bash
 #copy this and env-vars.env to /etc/cron.daily/ and make it executable
 #chmod 700 /etc/cron.daily/ddns_godaddy_configure.sh
 #This script will update the GoDaddy DNS record with the current external IP address of the machine it is running on.
@@ -13,9 +14,9 @@
 #this allegedly doesn't work on godaddy's production API, but it works on the test API due to a requirement of 50 domains in the account
 #https://www.reddit.com/r/godaddy/comments/1bl0f5r/am_i_the_only_one_who_cant_use_the_api/
 
-#!/bin/bash
-
-source env-vars.env
+SCRIPT_DIR=$(dirname "$(realpath "${BASH_SOURCE[0]}")")
+ENV_FILE="$SCRIPT_DIR/env-vars.env"
+source "$ENV_FILE"
 
 myip=`curl -s "https://api.ipify.org"`
 dnsdata=`curl -s -X GET -H "Authorization: sso-key ${gdapikey}" "https://api.ote-godaddy.com/v1/domains/${mydomain}/records/A/${myhostname}"`
