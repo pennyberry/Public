@@ -1,0 +1,12 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin
+    network_mode: host
+    volumes:
+      - /home/joe/Public/docker/jellyfin/volumes/config:/config
+      - /home/joe/Public/docker/jellyfin/volumes/cache:/cache
+      - type: bind
+    restart: unless-stopped
+    environment:
+      - PUID=0
+      - PGID=0
