@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  openhands-app:
+    image: docker.all-hands.dev/all-hands-ai/openhands:0.28
+    container_name: openhands-app
+    environment:
+      - SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.all-hands.dev/all-hands-ai/runtime:0.28-nikolaik
+      - LOG_ALL_EVENTS=true
+      - WORKSPACE_MOUNT_PATH=/home/joe/Public/docker/openhands/volumes/workspace
+      - PUID=0
+      - PGID=0
+      - SANDBOX_USER_ID=0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/joe/Public/docker/openhands/volumes/.openhands-state:/.openhands-state
+      - /home/joe/Public/docker/openhands/volumes/workspace:/opt/workspace_base
+    ports:
+      - "3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    network_mode: host

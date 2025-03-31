@@ -12,6 +12,6 @@ services:
       - PLEX_CLAIM=${plexclaim}
     volumes:
       - /home/joe/Public/docker/plex/volumes/config:/config
-      - /home/joe/Public/docker/sonarr/volumes/tv:/tv
+      - /home/joe/Public/docker/qbittorrent-nox/volumes/media/tv:/tv
       - /home/joe/Public/docker/radarr/volumes/movies:/movies
     restart: unless-stopped
