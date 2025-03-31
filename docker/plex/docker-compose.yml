@@ -13,5 +13,5 @@ services:
     volumes:
       - /home/joe/Public/docker/plex/volumes/config:/config
       - /home/joe/Public/docker/qbittorrent-nox/volumes/media/tv:/tv
-      - /home/joe/Public/docker/radarr/volumes/movies:/movies
+      - /home/joe/Public/docker/qbittorrent-nox/volumes/media/movies:/movies
     restart: unless-stopped
