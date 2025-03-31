@@ -9,7 +9,5 @@ services:
       - TZ=Etc/UTC
     volumes:
       - /home/joe/Public/docker/radarr/volumes/config:/config
-      - /home/joe/Public/docker/radarr/volumes/data:/data
-      - /home/joe/Public/docker/radarr/volumes/movies:/movies
-      - /home/joe/Public/docker/qbittorrent-nox/volumes/downloads:/downloads
+      - /home/joe/Public/docker/qbittorrent-nox/volumes/:/data
     restart: unless-stopped
