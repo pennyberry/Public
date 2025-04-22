@@ -1,0 +1,23 @@
+version: '3'
+services:
+  frigate-camera-streamer:
+    image: ghcr.io/blakeblackshear/frigate:stable
+    container_name: frigate
+    stop_grace_period: 30s 
+    restart: unless-stopped
+    shm_size: "512mb"
+    volumes:
+      - /home/joe/Public/docker/frigate/volumes/config:/config/
+      - /home/joe/Public/docker/frigate/volumes/media/frigate/clips:/media/frigate/clips
+      - /home/joe/Public/docker/frigate/volumes/media/frigate/recordings:/media/frigate/recordings
+      - /home/joe/Public/docker/frigate/volumes/media/frigate/exports:/media/frigate/exports
+      - type: tmpfs
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000 # 1GB
+    ports:
+      - "8971:8971"
+      - "5000:5000"
+      - "8554:8554" # RTSP feeds
+      - "8555:8555/tcp" # WebRTC over tcp
+      - "8555:8555/udp" # WebRTC over udp
