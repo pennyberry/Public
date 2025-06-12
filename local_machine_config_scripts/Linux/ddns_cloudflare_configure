@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #copy this and env-vars.env to /etc/cron.hourly/ and make it executable
-# cp /home/joe/Public/local_machine_config_scripts/Linux/ddns_cloudflare_configure.sh /etc/cron.hourly/
+# cp /home/joe/Public/local_machine_config_scripts/Linux/ddns_cloudflare_configure /etc/cron.hourly/ddns_cloudflare_configure
 # cp /home/joe/Public/local_machine_config_scripts/Linux/env-vars.env /etc/cron.hourly/
 # chmod +x /etc/cron.hourly/ddns_cloudflare_configure
 # chmod +x /etc/cron.hourly/env-vars.env
