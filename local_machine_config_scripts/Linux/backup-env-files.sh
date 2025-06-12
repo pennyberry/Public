@@ -32,7 +32,7 @@ done
 # new-item -ItemType File -Path C:\ProgramData\ssh\administrators_authorized_keys
 
 #generate ssh key using ssh-keygen on your linux device
-#paste the value in  C:\ProgramData\ssh\administrators_authorized_keys
+#paste the value of the public key in C:\ProgramData\ssh\administrators_authorized_keys
 #set your backup location like such in your env file:
 #BACKUP_LOCATION="USERWITHADMINRIGHTS@IPADDRESS:/Users/USERWITHADMINRIGHTS/somewhere/backuplocation.txt"
 
