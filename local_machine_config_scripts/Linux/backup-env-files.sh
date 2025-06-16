@@ -40,4 +40,4 @@ done
 scp "$BACKUP_PATH" ${BACKUP_LOCATION}
 
 #remove backup locally
-rm backup.txt
+rm "$HOME/backup.txt"
