@@ -7,6 +7,16 @@ services:
     environment:
       - OLLAMA_BASE_URL=${OLLAMAHOST}
       - CORS_ALLOW_ORIGIN=${CORSDOMAINS}
+      - ENABLE_OAUTH_SIGNUP=true
+      - WEBUI_AUTH_TRUSTED_EMAIL_HEADER=X-authentik-email
+      - OAUTH_MERGE_ACCOUNTS_BY_EMAIL=true
+      - OAUTH_PROVIDER_NAME=Authentik
+      - OPENID_PROVIDER_URL=https://${AUTHENTIKURL}/application/o/${AUTHENTIKAPPNAME}/.well-known/openid-configuration
+      - OAUTH_CLIENT_ID=${CLIENTID}
+      - OAUTH_CLIENT_SECRET=${CLIENTSECRET}
+      - OAUTH_SCOPES=openid email profile
+      - OPENID_REDIRECT_URI=https://${OPENWEBUIURL}/oauth/oidc/callback
+      - BYPASS_MODEL_ACCESS_CONTROL=true
     volumes:
       - /home/joe/Public/docker/openwebui/volumes:/app/backend/data
     restart: "always"
