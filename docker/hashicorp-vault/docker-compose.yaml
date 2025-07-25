@@ -19,6 +19,14 @@ services:
     entrypoint: "/docker-entrypoint.sh"
     command: ["server", "-dev"]
 
+# Examples for the environment variables
+# VAULT_API_ADDR=http://127.0.0.1:8200
+# VAULT_DEV_ROOT_TOKEN_ID=MAKE_THIS_SOME_SECRET_VALUE
+# VAULT_OIDC_CLIENT_SECRET=my-oidc-client-secret
+# VAULT_OIDC_CLIENT_ID=my-oidc-client-id
+# VAULT_OIDC_DISCOVERY_URL=https://example.com/.well-known/openid-configuration
+# VAULT_OIDC_REDIRECT_URI=http://127.0.0.1:8250/oidc/callback or https://yourvault.domain.com/ui/vault/auth/oidc/oidc/callback
+
 # put a .sh script in the docker-entrypoint-initvault.d folder
 # make it executable with chmos a+x
 # add secrets like so:
