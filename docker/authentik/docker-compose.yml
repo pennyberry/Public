@@ -32,7 +32,7 @@ services:
     volumes:
       - /home/joe/Public/docker/authentik/volumes/redis:/data
   server:
-    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2024.8.3}
+    image: ghcr.io/goauthentik/server:${AUTHENTIK_TAG:-2025.6.3}
     restart: unless-stopped
     command: server
     env_file:
@@ -53,7 +53,7 @@ services:
       - postgresql
       - redis
   worker:
-    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2024.8.3}
+    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2025.6.3}
     restart: unless-stopped
     command: worker
     environment:
