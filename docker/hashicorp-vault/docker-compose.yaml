@@ -1,10 +1,8 @@
-# https://medium.com/@christoph_40852/setting-up-hashicorp-vault-for-easy-development-in-a-docker-environment-41dc1b09d645
 services:
   vault:
     image: hashicorp/vault:latest
     environment:
       VAULT_API_ADDR: ${VAULT_API_ADDR}
-      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_DEV_ROOT_TOKEN_ID}
       VAULT_OIDC_CLIENT_SECRET: ${VAULT_OIDC_CLIENT_SECRET}
       VAULT_OIDC_CLIENT_ID: ${VAULT_OIDC_CLIENT_ID}
       VAULT_OIDC_DISCOVERY_URL: ${VAULT_OIDC_DISCOVERY_URL}
@@ -16,8 +14,9 @@ services:
     volumes:
       - /home/joe/Public/docker/hashicorp-vault/docker-entrypoint.sh:/docker-entrypoint.sh
       - /home/joe/Public/docker/hashicorp-vault/volumes/docker-entrypoint-initvault.d/:/docker-entrypoint-initvault.d/
-    entrypoint: "/docker-entrypoint.sh"
-    command: ["server", "-dev"]
+      - /home/joe/Public/docker/hashicorp-vault/volumes/vault/:/vault/file/
+      - /home/joe/Public/docker/hashicorp-vault/config.hcl:/vault/config/config.hcl
+    entrypoint: ["/docker-entrypoint.sh"]
 
 # Examples for the environment variables
 # VAULT_API_ADDR=http://127.0.0.1:8200
@@ -26,10 +25,3 @@ services:
 # VAULT_OIDC_CLIENT_ID=my-oidc-client-id
 # VAULT_OIDC_DISCOVERY_URL=https://example.com/.well-known/openid-configuration
 # VAULT_OIDC_REDIRECT_URI=http://127.0.0.1:8250/oidc/callback or https://yourvault.domain.com/ui/vault/auth/oidc/oidc/callback
-
-# put a .sh script in the docker-entrypoint-initvault.d folder
-# make it executable with chmos a+x
-# add secrets like so:
-  # #!/bin/sh
-  # vault secrets enable -path=secret kv
-  # vault kv put secret/db_password password="supersecret"
