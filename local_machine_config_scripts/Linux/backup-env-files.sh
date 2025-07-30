@@ -23,6 +23,16 @@ for ENV_FILE in "${ENV_FILES[@]}"; do
     echo >> $BACKUP_PATH
 done
 
+#backup to vault
+for ENV_FILE in "${ENV_FILES[@]}"; do
+      CURRENT_ENV_FILE="$ENV_FILE"
+      for SECRET in $(grep -oP '^\w+=' "$ENV_FILE" | sed 's/=$//'); do
+        SECRET_VALUE=$(grep -oP "^$SECRET=\K.*" "$CURRENT_ENV_FILE")
+        SECRET_PATH="$(realpath --relative-to=/home/joe/Public "$CURRENT_ENV_FILE")"/$SECRET
+        echo "Setting secret: $SECRET_PATH with value: $SECRET_VALUE"
+        . /home/joe/Public/local_machine_config_scripts/Linux/vault-secret-new.sh $SECRET_PATH "$SECRET_VALUE" ${VAULT_TOKEN}
+      done
+done
 
 #GUIDE TO ENABLE SSH on Windows
 # Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0

@@ -11,3 +11,5 @@ lemmy.hjson
 db
 volumes/
 *.secrets
+.vscode/
+*.code-workspace
