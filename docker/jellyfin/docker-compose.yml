@@ -5,7 +5,8 @@ services:
     volumes:
       - /home/joe/Public/docker/jellyfin/volumes/config:/config
       - /home/joe/Public/docker/jellyfin/volumes/cache:/cache
-      - type: bind
+      - /home/joe/Public/docker/qbittorrent-nox/volumes/media/tv:/media
+      - /home/joe/Public/docker/qbittorrent-nox/volumes/media/movies:/media2
     restart: unless-stopped
     environment:
       - PUID=0
