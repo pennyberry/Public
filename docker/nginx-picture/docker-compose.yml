@@ -1,0 +1,14 @@
+---
+services:
+  nginx:
+    image: lscr.io/linuxserver/nginx:latest
+    container_name: nginx
+    volumes:
+      - /home/joe/Public/docker/nginx-picture/volumes/config:/config
+    ports:
+      - 8084:80
+      - 4444:443
+    restart: unless-stopped
+
+# /volumes/config/www
+# this is the default web root for the nginx container
