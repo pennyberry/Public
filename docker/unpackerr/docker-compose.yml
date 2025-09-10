@@ -3,14 +3,15 @@ services:
     image: golift/unpackerr
     container_name: unpackerr
     volumes:
-      - /home/joe/Public/docker/qbittorrent-nox/volumes:/downloads
+      - /home/joe/Public/docker/qbittorrent-nox/volumes/downloads:/downloads
     restart: always
     environment:
       - PUID=0
       - PGID=0
       - TZ=America/New_York
       - UN_LOG_FILE=/downloads/unpackerr.log
-      - UN_FOLDER_0_PATH=/downloads/downloads/tv-sonarr
+      - UN_RADARR_0_PATHS_0=/downloads/radarr
+      - UN_SONARR_0_PATHS_0=/downloads/tv-sonarr
       - UN_SONARR_0_URL=${SONARRURL}
       - UN_SONARR_0_API_KEY=${SONARRAPIKEY}
       - UN_RADARR_0_URL=${RADARRURL}
