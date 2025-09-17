@@ -1,13 +1,13 @@
 services:
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
+    network_mode: bridge
     environment:
       - PUID=0
       - PGID=0
       - TZ=Etc/UTC
     volumes:
       - /home/joe/Public/docker/sonarr/volumes/data:/config
-      - /home/joe/Public/docker/sonarr/volumes/tv:/tv
       - /home/joe/Public/docker/qbittorrent-nox/volumes:/data
     ports:
       - 8989:8989

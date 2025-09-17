@@ -2,6 +2,7 @@ version: '3'
 services:
   filebrowser:
     image: filebrowser/filebrowser:s6
+    network_mode: bridge
     volumes:
       - /home/joe/Public/docker/filebrowser/volumes/srv:/srv
       - /home/joe/Public/docker/filebrowser/volumes/database:/database

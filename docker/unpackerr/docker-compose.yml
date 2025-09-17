@@ -1,6 +1,7 @@
 services:
   unpackerr:
     image: golift/unpackerr
+    network_mode: bridge
     container_name: unpackerr
     volumes:
       - /home/joe/Public/docker/qbittorrent-nox/volumes/downloads:/downloads

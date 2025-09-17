@@ -3,10 +3,21 @@ services:
     image: grafana/grafana-enterprise
     container_name: grafana
     restart: unless-stopped
+    network_mode: bridge
     user: '0'
     ports:
       - '3000:3000'
     volumes:
       - /home/joe/Public/docker/grafana/volumes/grafana:/var/lib/grafana
+    environment:
+      - GF_SERVER_ROOT_URL=https://${SUBDOMAIN}/
+      - GF_SERVER_DOMAIN=${SUBDOMAIN}
+      - GF_AUTH_GENERIC_OAUTH_CLIENT_ID=${CLIENTID}
+      - GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET=${CLIENTSECRET}
+      - GF_AUTH_GENERIC_OAUTH_AUTH_URL="https://${OAUTHDOMAIN}/application/o/authorize/"
+      - GF_AUTH_GENERIC_OAUTH_TOKEN_URL="https://${OAUTHDOMAIN}/application/o/token/"
+      - GF_AUTH_GENERIC_OAUTH_API_URL="https://${OAUTHDOMAIN}/application/o/userinfo/"
+      - GF_AUTH_SIGNOUT_REDIRECT_URL="https://${OAUTHDOMAIN}/application/o/grafana/end-session/"
+      - GF_AUTH_GENERIC_OAUTH_ENABLED="true"
 volumes:
   grafana-storage: {}

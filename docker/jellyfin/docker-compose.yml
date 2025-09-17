@@ -1,7 +1,7 @@
 services:
   jellyfin:
     image: jellyfin/jellyfin
-    network_mode: host
+    network_mode: bridge
     volumes:
       - /home/joe/Public/docker/jellyfin/volumes/config:/config
       - /home/joe/Public/docker/jellyfin/volumes/cache:/cache

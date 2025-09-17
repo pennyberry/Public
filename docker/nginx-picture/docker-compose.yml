@@ -2,6 +2,7 @@
 services:
   nginx:
     image: lscr.io/linuxserver/nginx:latest
+    network_mode: bridge
     container_name: nginx
     volumes:
       - /home/joe/Public/docker/nginx-picture/volumes/config:/config

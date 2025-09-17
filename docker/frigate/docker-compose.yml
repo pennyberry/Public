@@ -3,6 +3,7 @@ services:
   frigate-camera-streamer:
     image: ghcr.io/blakeblackshear/frigate:stable
     container_name: frigate
+    network_mode: bridge
     stop_grace_period: 30s 
     restart: unless-stopped
     shm_size: "512mb"
@@ -17,7 +18,7 @@ services:
           size: 1000000000 # 1GB
     ports:
       - "8971:8971"
-      - "5000:5000"
+      - "5000:5000" # Internal unauthenticated access. Expose carefully.
       - "8554:8554" # RTSP feeds
       - "8555:8555/tcp" # WebRTC over tcp
       - "8555:8555/udp" # WebRTC over udp

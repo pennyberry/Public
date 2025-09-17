@@ -4,6 +4,7 @@ services:
   glances:
     image: nicolargo/glances:latest-full
     restart: unless-stopped
+    network_mode: bridge
     ports:
       - "61208-61209:61208-61209"
     environment:

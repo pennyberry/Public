@@ -2,6 +2,7 @@ version: '3'
 services:
   autoheal:
     restart: always
+    network_mode: bridge
     image: willfarrell/autoheal
     environment:
       - AUTOHEAL_CONTAINER_LABEL=all

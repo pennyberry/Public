@@ -3,6 +3,7 @@ version: '3.8'
 services:
   prometheus-pve-exporter:
     image: prompve/prometheus-pve-exporter
+    network_mode: bridge
     container_name: prometheus-pve-exporter
     ports:
       - "9221:9221"
