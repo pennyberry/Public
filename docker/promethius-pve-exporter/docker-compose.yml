@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  prometheus-pve-exporter:
+    image: prompve/prometheus-pve-exporter
+    container_name: prometheus-pve-exporter
+    ports:
+      - "9221:9221"
+    volumes:
+      - /home/joe/Public/docker/promethius-pve-exporter/volumes/:/etc/prometheus/
+    restart: unless-stopped
