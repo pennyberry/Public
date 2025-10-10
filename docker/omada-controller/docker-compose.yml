@@ -4,9 +4,9 @@ services:
     container_name: omada-controller
     network_mode: host
     volumes:
-      - /home/joe/Public/docker/omada-controller/volumes/data:/opt/tplink/EAPController/data
-      - /home/joe/Public/docker/omada-controller/volumes/work:/opt/tplink/EAPController/work
-      - /home/joe/Public/docker/omada-controller/volumes/logs:/opt/tplink/EAPController/logs
+      - /mnt/zfs/nfs/applications/omada-controller/volumes/data:/opt/tplink/EAPController/data
+      - /mnt/zfs/nfs/applications/omada-controller/volumes/work:/opt/tplink/EAPController/work
+      - /mnt/zfs/nfs/applications/omada-controller/volumes/logs:/opt/tplink/EAPController/logs
     environment:
       - PUID=1000
       - PGID=1000

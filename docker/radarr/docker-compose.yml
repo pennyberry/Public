@@ -9,6 +9,6 @@ services:
       - PGID=0
       - TZ=Etc/UTC
     volumes:
-      - /home/joe/Public/docker/radarr/volumes/config:/config
-      - /home/joe/Public/docker/qbittorrent-nox/volumes/:/data
+      - /mnt/zfs/nfs/applications/radarr/volumes/config:/config
+      - /mnt/zfs/nfs/applications/qbittorrent-nox/volumes/:/data
     restart: unless-stopped

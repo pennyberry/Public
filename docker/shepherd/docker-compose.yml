@@ -1,0 +1,14 @@
+version: "3"
+services:
+  shepherd:
+    build: .
+    image: containrrr/shepherd
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - IGNORELIST_SERVICES=authentik_server
+      - SLEEP_TIME=720m
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager

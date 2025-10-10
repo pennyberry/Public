@@ -4,12 +4,12 @@ services:
     image: filebrowser/filebrowser:s6
     network_mode: bridge
     volumes:
-      - /home/joe/Public/docker/filebrowser/volumes/srv:/srv
-      - /home/joe/Public/docker/filebrowser/volumes/database:/database
-      - /home/joe/Public/docker/filebrowser/volumes/config:/config
+      - /mnt/zfs/nfs/applications/filebrowser/volumes/srv:/srv
+      - /mnt/zfs/nfs/applications/filebrowser/volumes/database:/database
+      - /mnt/zfs/nfs/applications/filebrowser/volumes/config:/config
     ports:
       - 8083:80
     restart: unless-stopped
     environment:
-      - PUID=$(id -u)
-      - PGID=$(id -g)
+      - PUID=0
+      - PGID=0

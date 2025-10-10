@@ -38,9 +38,9 @@ services:
     tmpfs:
     - /tmp
     volumes:
-    - /home/joe/Public/docker/qbittorrent-nox/volumes/config:/config
-    - /home/joe/Public/docker/qbittorrent-nox/volumes/config/gluetun:/config/data_gluetun
-    - /home/joe/Public/docker/qbittorrent-nox/volumes/downloads:/downloads
+    - /mnt/zfs/nfs/applications/qbittorrent-nox/volumes/config:/config
+    - /mnt/zfs/nfs/applications/qbittorrent-nox/volumes/config/gluetun:/config/data_gluetun
+    - /mnt/zfs/nfs/applications/qbittorrent-nox/volumes/downloads:/downloads
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://localhost:8080/api/v2/transfer/info | grep '\"connection_status\":\"connected\"' || exit 1"]
       interval: 1m30s

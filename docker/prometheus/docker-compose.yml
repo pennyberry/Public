@@ -5,5 +5,5 @@ services:
     ports:
       - 9090:9090
     volumes:
-      - /home/joe/Public/docker/prometheus/volumes/prometheus.yml:/etc/prometheus/prometheus.yml
+      - /mnt/zfs/nfs/applications/prometheus/volumes/prometheus.yml:/etc/prometheus/prometheus.yml
     restart: unless-stopped

@@ -4,6 +4,16 @@ services:
     image: lscr.io/linuxserver/plex:latest
     container_name: plex
     network_mode: bridge
+    ports:
+      - 32400:32400/tcp
+      - 3005:3005/tcp
+      - 8324:8324/tcp
+      - 32469:32469/tcp
+      - 1900:1900/udp
+      - 32410:32410/udp
+      - 32412:32412/udp
+      - 32413:32413/udp
+      - 32414:32414/udp
     environment:
       - PUID=0
       - PGID=0
@@ -11,7 +21,7 @@ services:
       - VERSION=docker
       - PLEX_CLAIM=${plexclaim}
     volumes:
-      - /home/joe/Public/docker/plex/volumes/config:/config
-      - /home/joe/Public/docker/qbittorrent-nox/volumes/media/tv:/tv
-      - /home/joe/Public/docker/qbittorrent-nox/volumes/media/movies:/movies
+      - /mnt/zfs/nfs/applications/plex/volumes/config:/config
+      - /mnt/zfs/nfs/applications/qbittorrent-nox/volumes/media/tv:/tv
+      - /mnt/zfs/nfs/applications/qbittorrent-nox/volumes/media/movies:/movies
     restart: unless-stopped

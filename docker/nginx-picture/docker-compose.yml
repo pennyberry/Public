@@ -5,7 +5,7 @@ services:
     network_mode: bridge
     container_name: nginx
     volumes:
-      - /home/joe/Public/docker/nginx-picture/volumes/config:/config
+      - /mnt/zfs/nfs/applications/nginx-picture/volumes/config:/config
     ports:
       - 8084:80
       - 4444:443

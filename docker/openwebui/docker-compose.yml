@@ -19,5 +19,5 @@ services:
       - OPENID_REDIRECT_URI=https://${OPENWEBUIURL}/oauth/oidc/callback
       - BYPASS_MODEL_ACCESS_CONTROL=true
     volumes:
-      - /home/joe/Public/docker/openwebui/volumes:/app/backend/data
+      - /mnt/zfs/nfs/applications/openwebui/volumes:/app/backend/data
     restart: "always"

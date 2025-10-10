@@ -8,5 +8,5 @@ services:
     ports:
       - "9221:9221"
     volumes:
-      - /home/joe/Public/docker/promethius-pve-exporter/volumes/:/etc/prometheus/
+      - /mnt/zfs/nfs/applications/prometheus-pve-exporter/volumes/:/etc/prometheus/
     restart: unless-stopped

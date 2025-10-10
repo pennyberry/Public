@@ -1,13 +1,18 @@
 services:
   jellyfin:
     image: jellyfin/jellyfin
-    network_mode: bridge
+    ports:
+      - 8096:8096/tcp
+      - 7359:7359/udp
     volumes:
-      - /home/joe/Public/docker/jellyfin/volumes/config:/config
-      - /home/joe/Public/docker/jellyfin/volumes/cache:/cache
-      - /home/joe/Public/docker/qbittorrent-nox/volumes/media/tv:/media
-      - /home/joe/Public/docker/qbittorrent-nox/volumes/media/movies:/media2
+      - /home/joe/applications/jellyfin/volumes/config:/config
+      - /home/joe/applications/jellyfin/volumes/cache:/cache
+      - /mnt/zfs/nfs/applications/qbittorrent-nox/volumes/media/tv:/media
+      - /mnt/zfs/nfs/applications/qbittorrent-nox/volumes/media/movies:/media2
     restart: unless-stopped
     environment:
       - PUID=0
       - PGID=0
+      - JELLYFIN_PublishedServerUrl=${JELLYFIN_PUBLISHEDSERVERURL}
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'

@@ -1,0 +1,16 @@
+version: "3.7"
+
+services:
+  autobrr:
+    container_name: autobrr
+    image: ghcr.io/autobrr/autobrr:latest
+    network_mode: bridge
+    restart: unless-stopped
+    environment:
+      - TZ=Etc/UTC
+      - PUID=0
+      - PGID=0
+    volumes:
+      - /mnt/zfs/nfs/applications/autobrr/volumes/config:/config
+    ports:
+      - 7474:7474

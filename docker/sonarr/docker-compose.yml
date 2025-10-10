@@ -7,8 +7,8 @@ services:
       - PGID=0
       - TZ=Etc/UTC
     volumes:
-      - /home/joe/Public/docker/sonarr/volumes/data:/config
-      - /home/joe/Public/docker/qbittorrent-nox/volumes:/data
+      - /mnt/zfs/nfs/applications/sonarr/volumes/data:/config
+      - /mnt/zfs/nfs/applications/qbittorrent-nox/volumes:/data
     ports:
       - 8989:8989
     restart: unless-stopped

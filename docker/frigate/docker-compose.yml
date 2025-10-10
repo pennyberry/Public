@@ -8,10 +8,10 @@ services:
     restart: unless-stopped
     shm_size: "512mb"
     volumes:
-      - /home/joe/Public/docker/frigate/volumes/config:/config/
-      - /home/joe/Public/docker/frigate/volumes/media/frigate/clips:/media/frigate/clips
-      - /home/joe/Public/docker/frigate/volumes/media/frigate/recordings:/media/frigate/recordings
-      - /home/joe/Public/docker/frigate/volumes/media/frigate/exports:/media/frigate/exports
+      - /mnt/zfs/nfs/applications/frigate/volumes/config:/config/
+      - /mnt/zfs/nfs/applications/frigate/volumes/media/frigate/clips:/media/frigate/clips
+      - /mnt/zfs/nfs/applications/frigate/volumes/media/frigate/recordings:/media/frigate/recordings
+      - /mnt/zfs/nfs/applications/frigate/volumes/media/frigate/exports:/media/frigate/exports
       - type: tmpfs
         target: /tmp/cache
         tmpfs:

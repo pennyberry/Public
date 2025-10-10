@@ -1,7 +1,3 @@
-###
-#logs for each proxy host are here /data/nginx/proxy_host/<number>.conf
-# 1.conf , 2.conf, etc...
-###
 version: '3.8'
 services:
   app:
@@ -24,13 +20,14 @@ services:
       # Uncomment this if IPv6 is not enabled on your host
       # DISABLE_IPV6: 'true'
     volumes:
-      - /home/joe/Public/docker/nginx-proxy-manager/volumes/data:/data
-      - /home/joe/Public/docker/nginx-proxy-manager/volumes/letsencrypt:/etc/letsencrypt
+      - /mnt/zfs/nfs/applications/nginx-proxy-manager/volumes/data:/data
+      - /mnt/zfs/nfs/applications/nginx-proxy-manager/volumes/letsencrypt:/etc/letsencrypt
     depends_on:
       - db
 
   db:
     image: 'jc21/mariadb-aria:latest'
+
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${sqlpassword}
@@ -39,4 +36,4 @@ services:
       MYSQL_PASSWORD: ${sqlpassword}
       MARIADB_AUTO_UPGRADE: '1'
     volumes:
-      - /home/joe/Public/docker/nginx-proxy-manager/volumes/mysql:/var/lib/mysql
+      - /mnt/zfs/nfs/applications/nginx-proxy-manager/volumes/mysql:/var/lib/mysql

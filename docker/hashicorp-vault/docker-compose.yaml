@@ -17,10 +17,10 @@ services:
     volumes:
       # - certs will be here /home/joe/Public/docker/nginx-proxy-manager/volumes/letsencrypt/live/npm-25:/opt/vault/tls/
       # will need some job to rename the certs to vault.crt and vault-cert.pem, vault-ca.pem, and vault-key.pem
-      - /home/joe/Public/docker/hashicorp-vault/docker-entrypoint.sh:/docker-entrypoint.sh
-      - /home/joe/Public/docker/hashicorp-vault/volumes/docker-entrypoint-initvault.d/:/docker-entrypoint-initvault.d/
-      - /home/joe/Public/docker/hashicorp-vault/volumes/vault/:/vault/file/
-      - /home/joe/Public/docker/hashicorp-vault/config.hcl:/vault/config/config.hcl
+      - /mnt/zfs/nfs/applications/hashicorp-vault/docker-entrypoint.sh:/docker-entrypoint.sh
+      - /mnt/zfs/nfs/applications/hashicorp-vault/volumes/docker-entrypoint-initvault.d/:/docker-entrypoint-initvault.d/
+      - /mnt/zfs/nfs/applications/hashicorp-vault/volumes/vault/:/vault/file/
+      - /mnt/zfs/nfs/applications/hashicorp-vault/config.hcl:/vault/config/config.hcl
     entrypoint: ["/docker-entrypoint.sh"]
 
 # Examples for the environment variables
