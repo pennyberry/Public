@@ -1,0 +1,10 @@
+services:
+  cloudflare-ddns:
+    image: favonia/cloudflare-ddns:latest
+    restart: unless-stopped
+    user: "1000:1000"
+    environment:
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      - DOMAINS=${DOMAINS}
+      - IP4_DOMAINS=${IP4_DOMAINS}
+      - IP6_PROVIDER=${IP6_PROVIDER}
