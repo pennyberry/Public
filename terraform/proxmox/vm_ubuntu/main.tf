@@ -51,10 +51,6 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
       ignore_changes = [ disk ]
     }
     initialization {
-      # user_account {
-      #   keys = [data.local_sensitive_file.ssh_key.content]
-      #   username = var.username
-      # }
       user_data_file_id = proxmox_virtual_environment_file.user_data_cloud_config.id
       ip_config {
         ipv4 {
