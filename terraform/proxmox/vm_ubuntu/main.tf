@@ -17,7 +17,8 @@ provider "proxmox" {
 
     ssh {
         agent    = true
-        username = "terraform"
+        username = "root"
+        password = var.SSH_PASSWORD
     }
 }
 resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
@@ -50,10 +51,11 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
       ignore_changes = [ disk ]
     }
     initialization {
-      user_account {
-        keys = [data.local_sensitive_file.ssh_key.content]
-        username = var.username
-      }
+      # user_account {
+      #   keys = [data.local_sensitive_file.ssh_key.content]
+      #   username = var.username
+      # }
+      user_data_file_id = proxmox_virtual_environment_file.user_data_cloud_config.id
       ip_config {
         ipv4 {
           address = "dhcp"
@@ -71,4 +73,38 @@ resource "proxmox_virtual_environment_download_file" "latest_ubuntu_24_noble_qco
 
 data "local_sensitive_file" "ssh_key" {
   filename = pathexpand("~/.ssh/id_rsa.pub")
+}
+
+resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
+  content_type = "snippets"
+  datastore_id = var.image_datastore_id
+  node_name    = var.image_node_name
+
+  source_raw {
+    data = <<-EOF
+    #cloud-config
+    hostname: test-ubuntu
+    timezone: America/New_York
+    users:
+      - default
+      - name: ${var.username}
+        groups:
+          - sudo
+        shell: /bin/bash
+        ssh_authorized_keys:
+          - ${trimspace(data.local_sensitive_file.ssh_key.content)}
+        sudo: ALL=(ALL) NOPASSWD:ALL
+    package_update: true
+    packages:
+      - qemu-guest-agent
+      - net-tools
+      - curl
+    runcmd:
+      - systemctl enable qemu-guest-agent
+      - systemctl start qemu-guest-agent
+      - echo "done" > /tmp/cloud-config.done
+    EOF
+
+    file_name = "user-data-cloud-config.yaml"
+  }
 }

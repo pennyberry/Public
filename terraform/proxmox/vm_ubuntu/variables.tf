@@ -140,6 +140,6 @@ variable "network_bridge" {
     type        = string
     default     = "vmbr0"
 }
-
-# Note: Provider credentials (PROXMOX_VE_ENDPOINT and PROXMOX_VE_API_TOKEN) are expected to be supplied
+variable "SSH_PASSWORD" {}
+# Note: Provider credentials (SSH_PASSWORD, PROXMOX_VE_ENDPOINT, and PROXMOX_VE_API_TOKEN) are expected to be supplied
 # via environment variables as recommended by the proxmox provider.
