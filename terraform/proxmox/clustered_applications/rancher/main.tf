@@ -17,7 +17,10 @@ module "rancher_control_node" {
     SSH_PASSWORD = var.SSH_PASSWORD  
     remote_exec_script = file("${path.module}/install-k3s.sh")
 }
+# Note: Provider credentials (SSH_PASSWORD, PROXMOX_VE_ENDPOINT, and PROXMOX_VE_API_TOKEN) are expected to be supplied
+# via environment variables as recommended by the proxmox provider.
+
 variable "SSH_PASSWORD" {}
 output "ip" {
-  value = module.rancher_control_node.ip
+  value = module.rancher_control_node.*.ip
 }

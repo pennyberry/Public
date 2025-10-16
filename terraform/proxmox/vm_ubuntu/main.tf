@@ -126,5 +126,5 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
 }
 
 output "ip" {
-  value = [for ip in flatten(proxmox_virtual_environment_vm.ubuntu_vm.*.ipv4_addresses) : ip if substr(ip, 0, 4) != "127."][0]
+  value = [for ip in flatten(proxmox_virtual_environment_vm.ubuntu_vm.*.ipv4_addresses) : ip if substr(ip, 0, 4) != "127."]
 }
