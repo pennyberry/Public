@@ -58,14 +58,13 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
     }
     provisioner "remote-exec" {
       when = create
-      inline = [
-        "echo 'Provisioning complete!' > /tmp/provisioning_complete.txt"
-      ]
+      inline = [var.remote_exec_script]
       connection {
         type        = "ssh"
         user        = var.username
         private_key = sensitive(file("~/.ssh/id_rsa"))
         host = [for ip in flatten(self.ipv4_addresses) : ip if substr(ip, 0, 4) != "127."][0]
+
         timeout     = "2m"
       }
     }
@@ -124,4 +123,8 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
 
     file_name = "user-data-cloud-config-${local.vm_names[count.index]}.yaml"
   }
+}
+
+output "ip" {
+  value = [for ip in flatten(proxmox_virtual_environment_vm.ubuntu_vm.*.ipv4_addresses) : ip if substr(ip, 0, 4) != "127."][0]
 }

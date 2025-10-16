@@ -1,0 +1,1 @@
+curl -fsL https://get.k3s.io | sh -s - --disable traefik --node-name control.k8s

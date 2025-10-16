@@ -137,5 +137,11 @@ variable "number_of_vms" {
   type = number
   default = 1
 }
+
+variable "remote_exec_script" {
+  description = "script to run via ssh after the machine has completed provisioning."
+  type = string
+  default = ""
+}
 # Note: Provider credentials (SSH_PASSWORD, PROXMOX_VE_ENDPOINT, and PROXMOX_VE_API_TOKEN) are expected to be supplied
 # via environment variables as recommended by the proxmox provider.
