@@ -21,12 +21,18 @@ provider "proxmox" {
         password = var.SSH_PASSWORD
     }
 }
+
+locals {
+  vm_indexes = range(var.number_of_vms)
+  vm_names = var.number_of_vms == 1 ? [var.proxmox_vm_name] : [for i in local.vm_indexes : "${var.proxmox_vm_name}-${i}"]
+}
+
 resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
-    name        = var.proxmox_vm_name
+    count       = var.number_of_vms
+    name        = local.vm_names[count.index]
     description = "Managed by Terraform"
     tags        = ["terraform", "ubuntu"]
-    node_name = var.proxmox_node_name
-    vm_id     = var.proxmox_vm_id
+    node_name   = var.proxmox_node_name
     agent {
       enabled = var.agent_enabled
     }
@@ -50,8 +56,21 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
     lifecycle {
       ignore_changes = [ disk ]
     }
+    provisioner "remote-exec" {
+      when = create
+      inline = [
+        "echo 'Provisioning complete!' > /tmp/provisioning_complete.txt"
+      ]
+      connection {
+        type        = "ssh"
+        user        = var.username
+        private_key = sensitive(file("~/.ssh/id_rsa"))
+        host = [for ip in flatten(self.ipv4_addresses) : ip if substr(ip, 0, 4) != "127."][0]
+        timeout     = "2m"
+      }
+    }
     initialization {
-      user_data_file_id = proxmox_virtual_environment_file.user_data_cloud_config.id
+      user_data_file_id = proxmox_virtual_environment_file.user_data_cloud_config[count.index].id
       ip_config {
         ipv4 {
           address = "dhcp"
@@ -72,6 +91,7 @@ data "local_sensitive_file" "ssh_key" {
 }
 
 resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
+  count = var.number_of_vms
   content_type = "snippets"
   datastore_id = var.image_datastore_id
   node_name    = var.image_node_name
@@ -79,7 +99,7 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
   source_raw {
     data = <<-EOF
     #cloud-config
-    hostname: ${var.proxmox_vm_name}
+    hostname: "${local.vm_names[count.index]}"
     timezone: America/New_York
     users:
       - default
@@ -98,9 +118,10 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
     runcmd:
       - systemctl enable qemu-guest-agent
       - systemctl start qemu-guest-agent
+      - sleep 5
       - echo "done" > /tmp/cloud-config.done
     EOF
 
-    file_name = "user-data-cloud-config.yaml"
+    file_name = "user-data-cloud-config-${local.vm_names[count.index]}.yaml"
   }
 }

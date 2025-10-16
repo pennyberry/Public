@@ -10,16 +10,6 @@ variable "proxmox_node_name" {
     default     = "pve"
 }
 
-variable "proxmox_vm_id" {
-    description = "Unique numeric VM ID for Proxmox (must not conflict with existing IDs)."
-    type        = number
-
-    validation {
-        condition     = var.proxmox_vm_id > 0 && var.proxmox_vm_id < 999999
-        error_message = "proxmox_vm_id must be a positive integer less than 999999."
-    }
-}
-
 variable "agent_enabled" {
     description = "Whether the QEMU guest agent should be enabled."
     type        = bool
@@ -141,5 +131,11 @@ variable "network_bridge" {
     default     = "vmbr0"
 }
 variable "SSH_PASSWORD" {}
+
+variable "number_of_vms" {
+  description = "Number of VMs to create."
+  type = number
+  default = 1
+}
 # Note: Provider credentials (SSH_PASSWORD, PROXMOX_VE_ENDPOINT, and PROXMOX_VE_API_TOKEN) are expected to be supplied
 # via environment variables as recommended by the proxmox provider.
