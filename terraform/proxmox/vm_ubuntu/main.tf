@@ -49,6 +49,7 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
       datastore_id = var.datastore_id
       interface    = var.interface
       import_from  = proxmox_virtual_environment_download_file.latest_ubuntu_24_noble_qcow2_img.id
+      size = var.disk_size_gb
     }
     network_device {
       bridge = var.network_bridge
@@ -127,4 +128,7 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
 
 output "ip" {
   value = [for ip in flatten(proxmox_virtual_environment_vm.ubuntu_vm.*.ipv4_addresses) : ip if substr(ip, 0, 4) != "127."]
+}
+output "name" {
+  value = proxmox_virtual_environment_vm.ubuntu_vm.*.name
 }

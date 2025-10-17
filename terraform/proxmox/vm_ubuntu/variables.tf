@@ -143,5 +143,10 @@ variable "remote_exec_script" {
   type = string
   default = ""
 }
+variable "disk_size_gb" {
+  description = "Size of the VM disk in GB."
+  type = number
+  default = 10
+}
 # Note: Provider credentials (SSH_PASSWORD, PROXMOX_VE_ENDPOINT, and PROXMOX_VE_API_TOKEN) are expected to be supplied
 # via environment variables as recommended by the proxmox provider.
