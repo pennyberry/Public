@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+metadata:
+  name: prowlarr
+kind: Deployment
+spec:
+  selector:
+    matchLabels:
+      tag: prowlarr
+  template:
+    metadata:
+      labels:
+        tag: prowlarr
+    spec:
+      containers:
+        - env:
+            - name: PGID
+              value: "0"
+            - name: PUID
+              value: "0"
+            - name: TZ
+              value: Etc/UTC
+          image: lscr.io/linuxserver/prowlarr:latest
+          name: prowlarr
+          ports:
+            - containerPort: 9696
+              protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prowlarr
+spec:
+  ports:
+    - port: 9696
+      targetPort: 9696
+  selector:
+    tag: prowlarr
+  type: LoadBalancer
