@@ -3,20 +3,18 @@ module "k3s_server_node" {
     proxmox_vm_name = "k3s-server"
     username = var.username
     agent_enabled = true
-    cpu_cores = 2
-    cpu_sockets = 1
-    cpu_type = "x86-64-v2-AES"
-    memory = 4096
-    disk_size_gb = 25
-    proxmox_node_name = "kiwi"
-    datastore_id = "nvme"
-    interface = "scsi0"
-    image_datastore_id = "iso-storage"
-    image_node_name = "kiwi"
-    network_bridge = "vmbr0"
+    cpu_cores = var.k3s_server_cpu_cores
+    memory = var.k3s_server_memory
+    disk_size_gb = var.k3s_server_disk_size_gb
+    proxmox_node_name = var.proxmox_node_name
+    datastore_id = var.datastore_id
+    image_datastore_id = var.image_datastore_id
+    image_node_name = var.image_node_name
+    network_bridge = var.k3s_server_network_bridge
     number_of_vms = 1
     SSH_PASSWORD = var.SSH_PASSWORD  
-    remote_exec_script = file("${path.module}/install-k3s-server.sh")
+    #replace the placeholder in the script with actual token (which should be set as an env variable)
+    remote_exec_script = replace(file("${path.module}/install-k3s-server.sh"), "k3s_token", var.k3s_token)
 }
 
 resource "null_resource" "get-kubectl-config" {
@@ -31,23 +29,20 @@ resource "null_resource" "get-kubectl-config" {
   depends_on = [ module.k3s_server_node ]
 }
 
-variable "username" {
-  default = "joe"
-}
-
-variable "SSH_PASSWORD" {
-  description = "Note: Provider credentials (SSH_PASSWORD, PROXMOX_VE_ENDPOINT, and PROXMOX_VE_API_TOKEN) are expected to be supplied via environment variables as recommended by the proxmox provider."
-}
-
-output "ip" {
-  value = module.k3s_server_node.*.ip[0][0]
-}
-
-output "Windows_Kubectl_command" {
-  value = "$env:KUBECONFIG = '${pathexpand("~/.kube/${module.k3s_server_node.name[0]}.yaml")}'"
-}
-output "Command_to_Update_IP_on_kube_config_yaml" {
-  value = <<EOT
-(get-content ~\.kube\k3s-server.yaml).Replace("127.0.0.1","${module.k3s_server_node.ip[0]}") | set-content ~\.kube\k3s-server.yaml
-EOT
+module "k3s_agent" {
+    source = "../../vm_ubuntu"
+    proxmox_vm_name = "k3s-agent"
+    username = var.username
+    cpu_cores = var.k3s_agent_cpu_cores
+    memory = var.k3s_agent_memory
+    disk_size_gb = var.k3s_agent_disk_size_gb
+    proxmox_node_name = var.proxmox_node_name
+    datastore_id = var.datastore_id
+    image_datastore_id = var.image_datastore_id
+    image_node_name = var.image_node_name
+    network_bridge = var.k3s_agent_network_bridge
+    number_of_vms = var.number_of_k3s_agents
+    SSH_PASSWORD = var.SSH_PASSWORD  
+    #replace the placeholders in the script with actual server IP (which will be found automatically) and token (which should be set as an env variable)
+    remote_exec_script = replace(replace(file("${path.module}/install-k3s-agent.sh"), "k3s-server-ip", module.k3s_server_node.ip[0]), "k3s_token", var.k3s_token)
 }
