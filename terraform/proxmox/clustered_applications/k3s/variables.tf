@@ -61,3 +61,7 @@ variable "k3s_agent_memory" {
 variable "k3s_agent_disk_size_gb" {
   default = 25
 }
+
+variable "k3s_cluster_ip" {
+  description = "dedicated MetalLB cluster IP that will be used in install-k3s-server.sh when building the server. Grab an unused IP from your network and set it here. Make sure you allocate the IP if using DHCP."
+}
