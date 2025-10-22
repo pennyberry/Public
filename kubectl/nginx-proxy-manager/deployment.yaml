@@ -1,0 +1,145 @@
+apiVersion: apps/v1
+metadata:
+  name: nginx-proxy-manager-app
+kind: Deployment
+spec:
+  selector:
+    matchLabels:
+      tag: nginx-proxy-manager-app
+  template:
+    metadata:
+      labels:
+        tag: nginx-proxy-manager-app
+    spec:
+      containers:
+        - env:
+          - name: DB_MYSQL_HOST
+            value: "nginx-proxy-manager-db"
+          - name: DB_MYSQL_PORT
+            value: "3306"
+          - name: DB_MYSQL_USER
+            value: "npm"
+          - name: DB_MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: nginx-proxy-manager-secret
+                key: sqlpassword
+          - name: DB_MYSQL_NAME
+            value: "npm"
+          image: jc21/nginx-proxy-manager:latest
+          name: nginx-proxy-manager-app
+          ports:
+            - containerPort: 80
+              protocol: TCP
+            - containerPort: 81
+              protocol: TCP
+            - containerPort: 443
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /data
+              name: nfs
+              subPath: applications/nginx-proxy-manager-2/volumes/data
+            - mountPath: /etc/letsencrypt
+              name: nfs
+              subPath: applications/nginx-proxy-manager-2/volumes/letsencrypt
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+      restartPolicy: Always
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15
+---
+apiVersion: apps/v1
+metadata:
+  name: nginx-proxy-manager-db
+kind: Deployment
+spec:
+  selector:
+    matchLabels:
+      tag: nginx-proxy-manager-db
+  template:
+    metadata:
+      labels:
+        tag: nginx-proxy-manager-db
+    spec:
+      containers:
+        - env:
+          - name: MYSQL_DATABASE
+            value: "npm"
+          - name: MYSQL_USER
+            value: "npm"
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: nginx-proxy-manager-secret
+                key: sqlpassword
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: nginx-proxy-manager-secret
+                key: sqlpassword
+          - name: MARIADB_AUTO_UPGRADE
+            value: "1"
+          image: jc21/mariadb-aria:latest
+          name: nginx-proxy-manager-db
+          ports:
+            - containerPort: 3306
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: nfs
+              subPath: applications/nginx-proxy-manager-2/volumes/mysql
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+      restartPolicy: Always
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-proxy-manager-app
+spec:
+  ports:
+    - port: 81
+      targetPort: 81
+      name: admin
+    - port: 80
+      targetPort: 80
+      name: http
+    - port: 443
+      targetPort: 443
+      name: https
+  selector:
+    tag: nginx-proxy-manager-app
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-proxy-manager-db
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+      name: nginx-proxy-manager-db
+  selector:
+    tag: nginx-proxy-manager-db
+  type: ClusterIP

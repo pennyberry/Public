@@ -50,4 +50,17 @@ spec:
   nfs:
     server: k3s_nfs_ip
     path: /mnt/zfs/nfs
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: truenas-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 39Ti
+  storageClassName: nfs
+  volumeName: truenas
 EOF
