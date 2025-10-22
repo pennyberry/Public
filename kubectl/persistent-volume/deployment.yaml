@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: truenas
+spec:
+  capacity:
+    storage: 39Ti
+  storageClassName: nfs
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: enter-your-nfs-server-ip-here
+    path: /your/nfs/path/

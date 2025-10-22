@@ -24,6 +24,14 @@ spec:
           ports:
             - containerPort: 9696
               protocol: TCP
+          volumeMounts:
+            - mountPath: /config
+              name: nfs
+              subPath: applications/prowlarr/volumes/config
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
       restartPolicy: Always
       tolerations:
         - key: "node.kubernetes.io/unreachable"
@@ -34,6 +42,19 @@ spec:
           operator: "Exists"    
           effect: "NoExecute"    
           tolerationSeconds: 15
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: truenas-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 39Ti
+  storageClassName: nfs
+  volumeName: truenas
 ---
 apiVersion: v1
 kind: Service

@@ -4,6 +4,9 @@ sudo ufw allow 6443/tcp #apiserver
 sudo ufw allow from 10.42.0.0/16 to any #pods
 sudo ufw allow from 10.43.0.0/16 to any #services
 
+#install nfs client for nfs storage class
+sudo apt-get install -y nfs-common
+
 # Configure MetalLB with a Layer 2 address pool
 sudo kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.15.2/config/manifests/metallb-native.yaml
 
@@ -15,7 +18,7 @@ sudo kubectl apply -f - <<'EOF'
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
-    name: MetallbAddressPool
+    name: metallbaddresspool
     namespace: metallb-system
 spec:
     addresses:
@@ -24,9 +27,27 @@ spec:
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
-    name: Layer2Advertisement
+    name: layer2advertisement
     namespace: metallb-system
 spec:
     ipAddressPools:
-        - MetallbAddressPool
+        - metallbaddresspool
+EOF
+
+#apply TrueNAS NFS persistent volume
+sudo kubectl apply -f - <<'EOF'
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: truenas
+spec:
+  capacity:
+    storage: 39Ti
+  storageClassName: nfs
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: k3s_nfs_ip
+    path: /mnt/zfs/nfs
 EOF
