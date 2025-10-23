@@ -117,6 +117,7 @@ kind: Service
 metadata:
   name: nginx-proxy-manager-app
 spec:
+  externalTrafficPolicy: Local
   ports:
     - port: 81
       targetPort: 81
