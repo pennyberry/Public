@@ -88,7 +88,14 @@ spec:
         - name: nfs
           persistentVolumeClaim:
             claimName: truenas-pvc
-      restartPolicy: Always
+      restartPolicy: Always      
+      resources:
+        requests:
+          memory: "1Gi"
+          cpu: "100m"
+        limits:
+          memory: "2Gi"
+          cpu: "1000m"
       tolerations:
         - key: "node.kubernetes.io/unreachable"
           operator: "Exists"
