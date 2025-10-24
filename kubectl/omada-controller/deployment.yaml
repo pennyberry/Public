@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+metadata:
+  name: omada-controller
+kind: Deployment
+spec:
+  selector:
+    matchLabels:
+      tag: omada-controller
+  template:
+    metadata:
+      labels:
+        tag: omada-controller
+    spec:
+      containers:
+        - env:
+          - name: PUID
+            value: "1000"
+          - name: PGID
+            value: "1000"
+          - name: TZ
+            value: "America/New_York"
+          - name: MANAGE_HTTP_PORT
+            value: "8088"
+          - name: PORTAL_HTTP_PORT
+            value: "8088"
+          image: mbentley/omada-controller:latest
+          name: omada-controller
+          ports:
+            - containerPort: 80
+              protocol: TCP
+            - containerPort: 81
+              protocol: TCP
+            - containerPort: 443
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /opt/tplink/EAPController/data
+              name: nfs
+              subPath: applications/omada-2/volumes/data
+            - mountPath: /opt/tplink/EAPController/work
+              name: nfs
+              subPath: applications/omada-2/volumes/work
+            - mountPath: /opt/tplink/EAPController/logs
+              name: nfs
+              subPath: applications/omada-2/volumes/logs
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+      restartPolicy: Always
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: omada-controller
+  annotations:
+    metallb.io/address-pool: metallbaddresspool
+spec:
+  externalTrafficPolicy: Local
+  ports:
+    - port: 19810
+      targetPort: 19810
+      protocol: UDP
+      name: udp-19810
+    - port: 27001
+      targetPort: 27001
+      protocol: UDP
+      name: udp-27001
+    - port: 29810
+      targetPort: 29810
+      protocol: UDP
+      name: udp-29810
+    - port: 29811
+      targetPort: 29811
+      protocol: TCP
+      name: tcp-29811
+    - port: 29812
+      targetPort: 29812
+      protocol: TCP
+      name: tcp-29812
+    - port: 29813
+      targetPort: 29813
+      protocol: TCP
+      name: tcp-29813
+    - port: 29814
+      targetPort: 29814
+      protocol: TCP
+      name: tcp-29814
+    - port: 29815
+      targetPort: 29815
+      protocol: TCP
+      name: tcp-29815
+    - port: 29816
+      targetPort: 29816
+      protocol: TCP
+      name: tcp-29816
+    - port: 29817
+      targetPort: 29817
+      protocol: TCP
+      name: tcp-29817
+    - port: 8043
+      targetPort: 8043
+      protocol: TCP
+      name: tcp-8043
+    - port: 8088
+      targetPort: 8088
+      protocol: TCP
+      name: tcp-8088
+    - port: 8843
+      targetPort: 8843
+      protocol: TCP
+      name: tcp-8843
+  selector:
+    tag: omada-controller
+  type: LoadBalancer
