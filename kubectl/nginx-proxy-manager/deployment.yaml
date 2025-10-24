@@ -47,6 +47,8 @@ spec:
           persistentVolumeClaim:
             claimName: truenas-pvc
       restartPolicy: Always
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
       tolerations:
         - key: "node.kubernetes.io/unreachable"
           operator: "Exists"
@@ -102,6 +104,7 @@ spec:
           persistentVolumeClaim:
             claimName: truenas-pvc
       restartPolicy: Always
+      hostNetwork: true
       tolerations:
         - key: "node.kubernetes.io/unreachable"
           operator: "Exists"
@@ -117,7 +120,7 @@ kind: Service
 metadata:
   name: nginx-proxy-manager-app
   annotations:
-    metallb.io/address-pool: metallbaddresspool
+    metallb.io/address-pool: metallbaddresspool-nginx
 spec:
   externalTrafficPolicy: Local
   ports:

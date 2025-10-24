@@ -14,7 +14,7 @@ module "k3s_server_node" {
     number_of_vms = 1
     SSH_PASSWORD = var.SSH_PASSWORD  
     #replace the placeholder in the script with actual token (which should be set as an env variable)
-    remote_exec_script = replace(replace(replace(file("${path.module}/install-k3s-server.sh"), "k3s_token", var.k3s_token), "k3s_cluster_ip", var.k3s_cluster_ip), "k3s_nfs_ip", var.k3s_nfs_ip)
+    remote_exec_script = replace(replace(replace(replace(file("${path.module}/install-k3s-server.sh"), "k3s_token", var.k3s_token), "k3s_cluster_ip", var.k3s_cluster_ip), "k3s_nfs_ip", var.k3s_nfs_ip), "k3s_cluster_ip_nginx", var.k3s_cluster_ip_nginx)
 }
 
 resource "null_resource" "get-kubectl-config" {

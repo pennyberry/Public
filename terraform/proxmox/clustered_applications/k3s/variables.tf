@@ -69,3 +69,6 @@ variable "k3s_cluster_ip" {
 variable "k3s_nfs_ip" {
   description = "NFS IP for persistent storage"
 }
+variable "k3s_cluster_ip_nginx" {
+  description = "NGINX Proxy Manager IP. This IP has to use externalTrafficPolicy: Local in the service definition to work correctly. MetalLB reference: https://metallb.universe.tf/usage/#ip-address-sharing"
+}

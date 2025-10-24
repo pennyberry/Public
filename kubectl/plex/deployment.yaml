@@ -1,0 +1,147 @@
+apiVersion: apps/v1
+metadata:
+  name: plex
+kind: Deployment
+spec:
+  selector:
+    matchLabels:
+      tag: plex
+  template:
+    metadata:
+      labels:
+        tag: plex
+    spec:
+      restartPolicy: Always
+      containers:
+        - env:
+          - name: PUID
+            value: "0"
+          - name: PGID
+            value: "0"
+          - name: TZ
+            value: "Etc/UTC"
+          - name: PLEX_CLAIM
+            valueFrom:
+              secretKeyRef:
+                name: plex-secret
+                key: plexclaim
+          - name: ADVERTISE_IP
+            valueFrom:
+              secretKeyRef:
+                name: plex-secret
+                key: ADVERTISE_IP
+          - name: VERSION
+            value: "docker"
+          image: plexinc/pms-docker:latest
+          name: plex
+          ports:
+          - containerPort: 32400
+            name: plex
+          - containerPort: 8324
+            name: plex-roku
+          - containerPort: 32469
+            name: plex-dlna
+          - containerPort: 1900
+            name: plex-upnp
+            protocol: UDP
+          - containerPort: 32410
+            name: plex-gdm-1
+            protocol: UDP
+          - containerPort: 32412
+            name: plex-gdm-2
+            protocol: UDP
+          - containerPort: 32413
+            name: plex-gdm-3
+            protocol: UDP
+          - containerPort: 32414
+            name: plex-gdm-4
+            protocol: UDP       
+          volumeMounts:
+            - mountPath: /config
+              name: nfs
+              subPath: applications/plex/volumes/config
+            - mountPath: /tv
+              name: nfs
+              subPath: applications/qbittorrent-nox/volumes/media/tv
+            - mountPath: /movies
+              name: nfs
+              subPath: applications/qbittorrent-nox/volumes/media/movies
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plex-tcp
+  annotations:
+    metallb.io/address-pool: metallbaddresspool
+    metallb.io/allow-shared-ip: "shared-ip"
+spec:
+  type: LoadBalancer
+  selector:
+    tag: plex
+  ports:
+    - name: tcp3005
+      port: 3005
+      targetPort: 3005
+      protocol: TCP
+    - name: tcp32400
+      port: 32400
+      targetPort: 32400
+      protocol: TCP
+    - name: tcp32469
+      port: 32469
+      targetPort: 32469
+      protocol: TCP
+    - name: tcp8324
+      port: 8324
+      targetPort: 8324
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plex-udp
+  annotations:
+    metallb.io/address-pool: metallbaddresspool
+    metallb.io/allow-shared-ip: "shared-ip"
+spec:
+  type: LoadBalancer
+  selector:
+    tag: plex
+  ports:
+    - name: udp1900
+      port: 1900
+      targetPort: 1900
+      protocol: UDP
+    - name: udp32410
+      port: 32410
+      targetPort: 32410
+      protocol: UDP
+    - name: udp32412
+      port: 32412
+      targetPort: 32412
+      protocol: UDP
+    - name: udp32413
+      port: 32413
+      targetPort: 32413
+      protocol: UDP
+    - name: udp32414
+      port: 32414
+      targetPort: 32414
+      protocol: UDP
+    - name: udp5353
+      port: 5353
+      targetPort: 5353
+      protocol: UDP

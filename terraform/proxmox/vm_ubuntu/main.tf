@@ -14,7 +14,7 @@ provider "proxmox" {
     # PROXMOX_VE_API_TOKEN use an environment variable for this!
     # run configure-pve-access.sh on your Proxmox server to create a user for terraform
     # e.g. "terraform@pve!provider=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-
+    insecure = true
     ssh {
         agent    = true
         username = "root"
@@ -55,7 +55,7 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
       bridge = var.network_bridge
     }
     lifecycle {
-      ignore_changes = [ disk ]
+      ignore_changes = [ disk, node_name, agent ]
     }
     provisioner "remote-exec" {
       when = create

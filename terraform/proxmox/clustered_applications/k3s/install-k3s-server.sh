@@ -25,6 +25,15 @@ spec:
         - k3s_cluster_ip/32
 ---
 apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+    name: metallbaddresspool-nginx
+    namespace: metallb-system
+spec:
+    addresses:
+        - k3s_cluster_ip_nginx/32
+---
+apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
     name: layer2advertisement
@@ -32,6 +41,7 @@ metadata:
 spec:
     ipAddressPools:
         - metallbaddresspool
+        - metallbaddresspool-nginx
 EOF
 
 #apply TrueNAS NFS persistent volume

@@ -1,47 +1,89 @@
+# this example runs in a rootless configuration
+
 apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: omada-controller
-kind: Deployment
 spec:
+  replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
-      tag: omada-controller
+      app: omada-controller
   template:
     metadata:
       labels:
-        tag: omada-controller
+        app: omada-controller
     spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        runAsNonRoot: false
+        fsGroup: 0
+        fsGroupChangePolicy: "OnRootMismatch"
+        seccompProfile:
+          type: RuntimeDefault
       containers:
-        - env:
-          - name: PUID
-            value: "1000"
-          - name: PGID
-            value: "1000"
-          - name: TZ
-            value: "America/New_York"
-          - name: MANAGE_HTTP_PORT
-            value: "8088"
-          - name: PORTAL_HTTP_PORT
-            value: "8088"
-          image: mbentley/omada-controller:latest
-          name: omada-controller
-          ports:
-            - containerPort: 80
-              protocol: TCP
-            - containerPort: 81
-              protocol: TCP
-            - containerPort: 443
-              protocol: TCP
-          volumeMounts:
-            - mountPath: /opt/tplink/EAPController/data
-              name: nfs
-              subPath: applications/omada-2/volumes/data
-            - mountPath: /opt/tplink/EAPController/work
-              name: nfs
-              subPath: applications/omada-2/volumes/work
-            - mountPath: /opt/tplink/EAPController/logs
-              name: nfs
-              subPath: applications/omada-2/volumes/logs
+      - name: omada-controller
+        image: mbentley/omada-controller:5.15
+        imagePullPolicy: Always
+        env:
+        - name: PUID
+          value: "0"
+        - name: PGID
+          value: "0"
+        - name: PGROUP
+          value: "root"
+        - name: PUSERNAME 
+          value: "root"
+        - name: ROOTLESS
+          value: "false"
+        - name: MANAGE_HTTP_PORT
+          value: "8088"
+        - name: MANAGE_HTTPS_PORT
+          value: "8043"
+        - name: PORTAL_HTTP_PORT
+          value: "8088"
+        - name: PORTAL_HTTPS_PORT
+          value: "8843"
+        - name: PORT_APP_DISCOVERY
+          value: "27001"
+        - name: PORT_ADOPT_V1
+          value: "29812"
+        - name: PORT_UPGRADE_V1
+          value: "29813"
+        - name: PORT_MANAGER_V1
+          value: "29811"
+        - name: PORT_MANAGER_V2
+          value: "29814"
+        - name: PORT_DISCOVERY
+          value: "29810"
+        - name: PORT_TRANSFER_V2
+          value: "29815"
+        - name: PORT_RTTY
+          value: "29816"
+        - name: PORT_DEVICE_MONITOR
+          value: "29817"
+        - name: SHOW_SERVER_LOGS
+          value: "true"
+        - name: SHOW_MONGODB_LOGS
+          value: "false"
+        - name: SSL_CERT_NAME
+          value: tls.crt
+        - name: SSL_KEY_NAME
+          value: tls.key
+        - name: TZ
+          value: Etc/UTC
+        - name: SKIP_USERMOD
+          value: "true"
+        volumeMounts:
+          - mountPath: /opt/tplink/EAPController/data
+            name: nfs
+            subPath: applications/omada-2/volumes/data
+          - mountPath: /opt/tplink/EAPController/logs
+            name: nfs
+            subPath: applications/omada-2/volumes/logs
       volumes:
         - name: nfs
           persistentVolumeClaim:
@@ -60,64 +102,77 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: omada-controller
+  name: omada-svc-tcp
   annotations:
     metallb.io/address-pool: metallbaddresspool
+    metallb.io/allow-shared-ip: "shared-ip"
 spec:
-  externalTrafficPolicy: Local
+  type: LoadBalancer
+  selector:
+    app: omada-controller
   ports:
-    - port: 19810
-      targetPort: 19810
-      protocol: UDP
-      name: udp-19810
-    - port: 27001
-      targetPort: 27001
-      protocol: UDP
-      name: udp-27001
-    - port: 29810
-      targetPort: 29810
-      protocol: UDP
-      name: udp-29810
-    - port: 29811
-      targetPort: 29811
-      protocol: TCP
-      name: tcp-29811
-    - port: 29812
-      targetPort: 29812
-      protocol: TCP
-      name: tcp-29812
-    - port: 29813
-      targetPort: 29813
-      protocol: TCP
-      name: tcp-29813
-    - port: 29814
-      targetPort: 29814
-      protocol: TCP
-      name: tcp-29814
-    - port: 29815
-      targetPort: 29815
-      protocol: TCP
-      name: tcp-29815
-    - port: 29816
-      targetPort: 29816
-      protocol: TCP
-      name: tcp-29816
-    - port: 29817
-      targetPort: 29817
-      protocol: TCP
-      name: tcp-29817
-    - port: 8043
-      targetPort: 8043
-      protocol: TCP
-      name: tcp-8043
-    - port: 8088
+    - name: manage-http
+      port: 8088
       targetPort: 8088
       protocol: TCP
-      name: tcp-8088
-    - port: 8843
+    - name: manage-https
+      port: 8043
+      targetPort: 8043
+      protocol: TCP
+    - name: portal-https
+      port: 8843
       targetPort: 8843
       protocol: TCP
-      name: tcp-8843
-  selector:
-    tag: omada-controller
+    - name: adopt-v1
+      port: 29812
+      targetPort: 29812
+      protocol: TCP
+    - name: upgrade-v1
+      port: 29813
+      targetPort: 29813
+      protocol: TCP
+    - name: manager-v1
+      port: 29811
+      targetPort: 29811
+      protocol: TCP
+    - name: manager-v2
+      port: 29814
+      targetPort: 29814
+      protocol: TCP
+    - name: transfer-v2
+      port: 29815
+      targetPort: 29815
+      protocol: TCP
+    - name: rtty
+      port: 29816
+      targetPort: 29816
+      protocol: TCP
+    - name: device-monitor
+      port: 29817
+      targetPort: 29817
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: omada-svc-udp
+  annotations:
+    metallb.io/address-pool: metallbaddresspool
+    metallb.io/allow-shared-ip: "shared-ip"
+spec:
   type: LoadBalancer
+  selector:
+    app: omada-controller
+  ports:
+    - name: app-discovery
+      port: 27001
+      targetPort: 27001
+      protocol: UDP
+    - name: udp-discovery
+      port: 29810
+      targetPort: 29810
+      protocol: UDP
+    - name: udp-management
+      port: 19810
+      targetPort: 19810
+      protocol: UDP
