@@ -31,7 +31,7 @@ metadata:
     namespace: metallb-system
 spec:
     addresses:
-        - k3s_cluster_ip_nginx/32
+        - k3s_nginx_cluster_ip/32
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement

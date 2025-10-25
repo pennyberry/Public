@@ -71,6 +71,7 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
     }
     initialization {
       user_data_file_id = proxmox_virtual_environment_file.user_data_cloud_config[count.index].id
+      datastore_id = var.image_datastore_id
       ip_config {
         ipv4 {
           address = "dhcp"
@@ -95,6 +96,7 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
   content_type = "snippets"
   datastore_id = var.image_datastore_id
   node_name    = var.image_node_name
+
 
   source_raw {
     data = <<-EOF
