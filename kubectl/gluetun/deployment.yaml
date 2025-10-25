@@ -1,0 +1,77 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: gluetun
+    labels:
+        app: gluetun
+spec:
+    strategy:
+        type: Recreate
+    selector:
+        matchLabels:
+            app: gluetun
+    template:
+        metadata:
+            labels:
+                app: gluetun
+        spec:
+            initContainers:
+                - name: gluetun
+                  restartPolicy: Always
+                  image: qmcgaw/gluetun
+                  imagePullPolicy: Always
+                  securityContext:
+                      capabilities:
+                          add:
+                              - 'NET_ADMIN'
+                  env:
+                      - name: DNS_KEEP_NAMESERVER
+                        value: "on"
+                      - name: FIREWALL_OUTBOUND_SUBNETS
+                        value: "10.42.0.0/15"
+                      - name: VPN_SERVICE_PROVIDER
+                        value: protonvpn
+                      - name: VPN_TYPE
+                        value: wireguard
+                      - name: SERVER_COUNTRIES
+                        value: United States
+                      - name: PORT_FORWARD_ONLY
+                        value: on
+                      - name: VPN_PORT_FORWARDING_PROVIDER
+                        value: protonvpn
+                      - name: VPN_PORT_FORWARDING
+                        value: on
+                      - name: DOT
+                        value: off
+                      - name: WIREGUARD_PRIVATE_KEY
+                        valueFrom:
+                            secretKeyRef:
+                                name: gluetun-secrets
+                                key: PRIVATEKEY
+                - name: curlpodtest
+                  image: alpine/curl
+                  ports:
+                    - containerPort: 80
+                      hostPort: 88
+                  command: ['/bin/sh', '-c']
+                  args:
+                      - &check-ip |
+                          IP=$(nslookup 123.joeberry.org | awk '/^Address: / { print $2 }')
+                          EXPECTED_IP=$(curl checkip.amazonaws.com)
+                          if [ "$IP" != "$EXPECTED_IP" ]; then
+                            echo "IP is different from $EXPECTED_IP. Current IP is $IP."
+                          else
+                            echo "IP is $EXPECTED_IP. Exiting..."
+                            exit 1
+                          fi
+            containers:
+                # Run whatever you want to ensure is going out the tunnel here
+                - name: curlpod
+                  image: curlimages/curl
+                  args:
+                      - /bin/sh
+                      - -c
+                      - while true; do curl wttr.in; sleep 5;
+                        done
+                  imagePullPolicy: Always
