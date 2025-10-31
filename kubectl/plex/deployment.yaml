@@ -14,10 +14,6 @@ spec:
       restartPolicy: Always
       containers:
         - env:
-          - name: PUID
-            value: "0"
-          - name: PGID
-            value: "0"
           - name: TZ
             value: "Etc/UTC"
           - name: PLEX_CLAIM
@@ -25,11 +21,6 @@ spec:
               secretKeyRef:
                 name: plex-secret
                 key: plexclaim
-          - name: ADVERTISE_IP
-            valueFrom:
-              secretKeyRef:
-                name: plex-secret
-                key: ADVERTISE_IP
           - name: VERSION
             value: "docker"
           image: plexinc/pms-docker:latest
@@ -59,13 +50,20 @@ spec:
           volumeMounts:
             - mountPath: /config
               name: nfs
-              subPath: applications/plex/volumes/config
+              subPath: applications/plex/volumes/config2
             - mountPath: /tv
               name: nfs
               subPath: applications/qbittorrent-nox/volumes/media/tv
             - mountPath: /movies
               name: nfs
               subPath: applications/qbittorrent-nox/volumes/media/movies
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "100m"
+            limits:
+              memory: "3Gi"
+              cpu: "1000m"
       volumes:
         - name: nfs
           persistentVolumeClaim:

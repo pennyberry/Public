@@ -84,18 +84,18 @@ spec:
           - mountPath: /opt/tplink/EAPController/logs
             name: nfs
             subPath: applications/omada-2/volumes/logs
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "100m"
+          limits:
+            memory: "3Gi"
+            cpu: "1000m"
       volumes:
         - name: nfs
           persistentVolumeClaim:
             claimName: truenas-pvc
       restartPolicy: Always      
-      resources:
-        requests:
-          memory: "1Gi"
-          cpu: "100m"
-        limits:
-          memory: "2Gi"
-          cpu: "1000m"
       tolerations:
         - key: "node.kubernetes.io/unreachable"
           operator: "Exists"

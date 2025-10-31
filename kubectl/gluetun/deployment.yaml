@@ -26,10 +26,6 @@ spec:
                           add:
                               - 'NET_ADMIN'
                   env:
-                      - name: DNS_KEEP_NAMESERVER
-                        value: "on"
-                      - name: FIREWALL_OUTBOUND_SUBNETS
-                        value: "10.42.0.0/15"
                       - name: VPN_SERVICE_PROVIDER
                         value: protonvpn
                       - name: VPN_TYPE
