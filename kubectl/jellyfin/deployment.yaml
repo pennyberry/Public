@@ -43,15 +43,17 @@ spec:
             - mountPath: /media2
               name: nfs
               subPath: applications/qbittorrent-nox/volumes/media/movies          
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "100m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
       volumes:
         - name: nfs
           persistentVolumeClaim:
             claimName: truenas-pvc
-      resources:
-        requests:
-          memory: "1Gi"
-        limits:
-          memory: "2Gi"
       restartPolicy: Always
       tolerations:
         - key: "node.kubernetes.io/unreachable"

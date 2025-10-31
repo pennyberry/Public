@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflare-ddns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflare-ddns
+  template:
+    metadata:
+      labels:
+        app: cloudflare-ddns
+    spec:
+      containers:
+        - name: cloudflare-ddns
+          image: favonia/cloudflare-ddns:latest
+          env:
+          - name: CLOUDFLARE_API_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: cloudflare-ddns-secrets
+                key: CLOUDFLARE_API_TOKEN
+          - name: DOMAINS
+            valueFrom:
+              secretKeyRef:
+                name: cloudflare-ddns-secrets
+                key: DOMAINS
+          - name: IP6_PROVIDER
+            valueFrom:
+              secretKeyRef:
+                name: cloudflare-ddns-secrets
+                key: IP6_PROVIDER         
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "10m"
+            limits:
+              memory: "512Mi"
+              cpu: "1000m"
+      restartPolicy: Always
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15
