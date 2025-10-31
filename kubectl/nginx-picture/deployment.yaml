@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-picture
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-picture
+  template:
+    metadata:
+      labels:
+        app: nginx-picture
+    spec:
+      containers:
+        - name: nginx-picture
+          image:  lscr.io/linuxserver/nginx:latest
+          resources:
+            requests:
+              memory: "50Mi"
+              cpu: "10m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"  
+          volumeMounts:
+            - mountPath: /config
+              name: nfs
+              subPath: applications/nginx-picture/volumes/config
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15          
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-picture-service-tcp
+  annotations:
+    metallb.io/address-pool: metallbaddresspool
+    metallb.io/allow-shared-ip: "shared-ip"
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx-picture
+  ports:
+    - name: http
+      port: 8084
+      targetPort: 80
+      protocol: TCP
+    - name: internal
+      port: 4444
+      targetPort: 443
+      protocol: TCP
