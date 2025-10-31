@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana-enterprise
+          env:
+            - name: GF_SERVER_ROOT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-secrets
+                  key: GF_SERVER_ROOT_URL
+            - name: GF_SERVER_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-secrets
+                  key: GF_SERVER_DOMAIN
+            - name: GF_AUTH_GENERIC_OAUTH_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-secrets
+                  key: GF_AUTH_GENERIC_OAUTH_CLIENT_ID
+            - name: GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-secrets
+                  key: GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
+            - name: GF_AUTH_GENERIC_OAUTH_AUTH_URL
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-secrets
+                  key: GF_AUTH_GENERIC_OAUTH_AUTH_URL
+            - name: GF_AUTH_GENERIC_OAUTH_TOKEN_URL
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-secrets
+                  key: GF_AUTH_GENERIC_OAUTH_TOKEN_URL
+            - name: GF_AUTH_GENERIC_OAUTH_API_URL
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-secrets
+                  key: GF_AUTH_GENERIC_OAUTH_API_URL
+            - name: GF_AUTH_SIGNOUT_REDIRECT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-secrets
+                  key: GF_AUTH_SIGNOUT_REDIRECT_URL
+            - name: GF_AUTH_GENERIC_OAUTH_ENABLED
+              value: "true"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "10m"
+            limits:
+              memory: "512Mi"
+              cpu: "1000m"
+          volumeMounts:
+            - mountPath: /var/lib/grafana
+              name: nfs
+              subPath: applications/grafana/volumes/grafana
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15          
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-service-tcp
+  annotations:
+    metallb.io/address-pool: metallbaddresspool
+    metallb.io/allow-shared-ip: "shared-ip"
+spec:
+  type: LoadBalancer
+  selector:
+    app: grafana
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+      protocol: TCP
