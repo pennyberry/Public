@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unpackerr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: unpackerr
+  template:
+    metadata:
+      labels:
+        app: unpackerr
+    spec:
+      containers:
+        - name: unpackerr
+          image:  golift/unpackerr
+          env:
+            - name: PUID
+              value: "0"
+            - name: PGID
+              value: "0"
+            - name: TZ
+              value: "America/New_York"
+            - name: UN_LOG_FILE
+              value: "/downloads/unpackerr.log"
+            - name: UN_RADARR_0_PATHS_0
+              value: "/downloads/radarr"
+            - name: UN_SONARR_0_PATHS_0
+              value: "/downloads/tv-sonarr"
+            - name: UN_FOLDER_0_MOVE_BACK
+              value: "true"                                                                                  
+            - name: UN_SONARR_0_URL
+              valueFrom:
+                secretKeyRef:
+                  name: unpackerr-secrets
+                  key: UN_SONARR_0_URL
+            - name: UN_SONARR_0_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: unpackerr-secrets
+                  key: UN_SONARR_0_API_KEY
+            - name: UN_RADARR_0_URL
+              valueFrom:
+                secretKeyRef:
+                  name: unpackerr-secrets
+                  key: UN_RADARR_0_URL
+            - name: UN_RADARR_0_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: unpackerr-secrets
+                  key: UN_RADARR_0_API_KEY                                                                    
+          resources:
+            requests:
+              memory: "50Mi"
+              cpu: "10m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"  
+          volumeMounts:
+            - mountPath: /downloads
+              name: nfs
+              subPath: applications/qbittorrent-nox/volumes/downloads
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15          
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
