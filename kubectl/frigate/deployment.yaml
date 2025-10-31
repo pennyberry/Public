@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frigate
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frigate
+  template:
+    metadata:
+      labels:
+        app: frigate
+    spec:
+      containers:
+        - name: frigate
+          image: ghcr.io/blakeblackshear/frigate:stable
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "10m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"  
+          volumeMounts:
+            - mountPath: /config
+              name: nfs
+              subPath: applications/frigate/volumes/config
+            - mountPath: /media/frigate/clips
+              name: nfs
+              subPath: applications/frigate/volumes/media/frigate/clips
+            - mountPath: /media/frigate/recordings
+              name: nfs
+              subPath: applications/frigate/volumes/media/frigate/recordings
+            - mountPath: /media/frigate/exports
+              name: nfs
+              subPath: applications/frigate/volumes/media/frigate/exports          
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15          
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frigate-service-tcp
+  annotations:
+    metallb.io/address-pool: metallbaddresspool
+    metallb.io/allow-shared-ip: "shared-ip"
+spec:
+  type: LoadBalancer
+  selector:
+    app: frigate
+  ports:
+    - name: http
+      port: 8971
+      targetPort: 8971
+      protocol: TCP
+    - name: internal
+      port: 5000
+      targetPort: 5000
+      protocol: TCP
+    - name: rtsp
+      port: 8554
+      targetPort: 8554
+      protocol: TCP
+    - name: webrtc
+      port: 8555
+      targetPort: 8555
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frigate-service-udp
+  annotations:
+    metallb.io/address-pool: metallbaddresspool
+    metallb.io/allow-shared-ip: "shared-ip"
+spec:
+  type: LoadBalancer
+  selector:
+    app: frigate
+  ports:
+    - name: webrtc
+      port: 8555
+      targetPort: 8555
+      protocol: UDP
