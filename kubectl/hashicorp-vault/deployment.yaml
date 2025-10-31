@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hashicorp-vault
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hashicorp-vault
+  template:
+    metadata:
+      labels:
+        app: hashicorp-vault
+    spec:
+      containers:
+        - name: hashicorp-vault
+          image: hashicorp/vault:latest
+          args:
+            - /docker-entrypoint.sh
+          securityContext:
+              capabilities:
+                  add:
+                      - 'IPC_LOCK'
+          env:
+            - name: VAULT_API_ADDR
+              valueFrom:
+                secretKeyRef:
+                  name: hashicorp-vault-secrets
+                  key: VAULT_API_ADDR
+            - name: VAULT_OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: hashicorp-vault-secrets
+                  key: VAULT_OIDC_CLIENT_SECRET
+            - name: VAULT_OIDC_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: hashicorp-vault-secrets
+                  key: VAULT_OIDC_CLIENT_ID
+            - name: VAULT_OIDC_DISCOVERY_URL
+              valueFrom:
+                secretKeyRef:
+                  name: hashicorp-vault-secrets
+                  key: VAULT_OIDC_DISCOVERY_URL
+            - name: VAULT_OIDC_REDIRECT_URI
+              valueFrom:
+                secretKeyRef:
+                  name: hashicorp-vault-secrets
+                  key: VAULT_OIDC_REDIRECT_URI
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "10m"
+            limits:
+              memory: "512Mi"
+              cpu: "1000m"
+          volumeMounts:
+            - mountPath: /docker-entrypoint.sh
+              name: nfs
+              subPath: applications/hashicorp-vault/docker-entrypoint.sh
+            - mountPath: /docker-entrypoint-initvault.d/
+              name: nfs
+              subPath: applications/hashicorp-vault/volumes/docker-entrypoint-initvault.d
+            - mountPath: /vault/file
+              name: nfs
+              subPath: applications/hashicorp-vault/volumes/vault
+            - mountPath: /vault/config/config.hcl
+              name: nfs
+              subPath: applications/hashicorp-vault/config.hcl
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15          
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hashicorp-vault-service-tcp
+  annotations:
+    metallb.io/address-pool: metallbaddresspool
+    metallb.io/allow-shared-ip: "shared-ip"
+spec:
+  type: LoadBalancer
+  selector:
+    app: hashicorp-vault
+  ports:
+    - name: http
+      port: 8200
+      targetPort: 8200
+      protocol: TCP
