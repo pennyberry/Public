@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openwebui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openwebui
+  template:
+    metadata:
+      labels:
+        app: openwebui
+    spec:
+      containers:
+        - name: openwebui
+          image: ghcr.io/open-webui/open-webui:main
+          env:
+            - name: OLLAMA_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: openwebui-secrets
+                  key: OLLAMA_BASE_URL
+            - name: CORS_ALLOW_ORIGIN
+              valueFrom:
+                secretKeyRef:
+                  name: openwebui-secrets
+                  key: CORS_ALLOW_ORIGIN
+            - name: OAUTH_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: openwebui-secrets
+                  key: OAUTH_CLIENT_ID
+            - name: OAUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: openwebui-secrets
+                  key: OAUTH_CLIENT_SECRET
+            - name: OPENID_REDIRECT_URI
+              valueFrom:
+                secretKeyRef:
+                  name: openwebui-secrets
+                  key: OPENID_REDIRECT_URI
+            - name: OPENID_PROVIDER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: openwebui-secrets
+                  key: OPENID_PROVIDER_URL
+            - name: ENABLE_OAUTH_SIGNUP
+              value: "true"
+            - name: WEBUI_AUTH_TRUSTED_EMAIL_HEADER
+              value: "X-authentik-email"        
+            - name: OAUTH_MERGE_ACCOUNTS_BY_EMAIL
+              value: "true"
+            - name: OAUTH_PROVIDER_NAME
+              value: "Authentik"
+            - name: OAUTH_SCOPES
+              value: "openid email profile"
+            - name: BYPASS_MODEL_ACCESS_CONTROL
+              value: "true"              
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "10m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+          volumeMounts:
+            - mountPath: /app/backend/data
+              name: nfs
+              subPath: applications/openwebui/volumes
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15          
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openwebui-service-tcp
+  annotations:
+    metallb.io/address-pool: metallbaddresspool
+    metallb.io/allow-shared-ip: "shared-ip"
+spec:
+  type: LoadBalancer
+  selector:
+    app: openwebui
+  ports:
+    - name: http
+      port: 3022
+      targetPort: 8080
+      protocol: TCP
