@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: prowlarr
+  name: radarr
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: prowlarr
+      app: radarr
   template:
     metadata:
       labels:
-        app: prowlarr
+        app: radarr
     spec:
       containers:
-        - name: prowlarr
-          image: lscr.io/linuxserver/prowlarr:latest            
+        - name: radarr
+          image: ghcr.io/hotio/radarr            
           resources:
             requests:
               memory: "128Mi"
@@ -25,7 +25,10 @@ spec:
           volumeMounts:
             - mountPath: /config
               name: nfs
-              subPath: applications/prowlarr/volumes/config
+              subPath: applications/radarr/volumes/config
+            - mountPath: /data
+              name: nfs
+              subPath: applications/qbittorrent-nox/volumes              
       tolerations:
         - key: "node.kubernetes.io/unreachable"
           operator: "Exists"
@@ -43,16 +46,16 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: prowlarr-service
+  name: radarr-service
   annotations:
     metallb.io/address-pool: metallbaddresspool
     metallb.io/allow-shared-ip: "shared-ip"
 spec:
   type: LoadBalancer
   selector:
-    app: prowlarr
+    app: radarr
   ports:
     - name: http
-      port: 9696
-      targetPort: 9696
+      port: 7878
+      targetPort: 7878
       protocol: TCP

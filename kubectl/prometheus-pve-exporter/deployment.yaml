@@ -1,31 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: prowlarr
+  name: prometheus-pve-exporter
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: prowlarr
+      app: prometheus-pve-exporter
   template:
     metadata:
       labels:
-        app: prowlarr
+        app: prometheus-pve-exporter
     spec:
       containers:
-        - name: prowlarr
-          image: lscr.io/linuxserver/prowlarr:latest            
+        - name: prometheus-pve-exporter
+          image: prompve/prometheus-pve-exporter            
           resources:
             requests:
               memory: "128Mi"
               cpu: "10m"
             limits:
-              memory: "512Mi"
+              memory: "256Mi"
               cpu: "1000m"  
           volumeMounts:
-            - mountPath: /config
+            - mountPath: /etc/prometheus
               name: nfs
-              subPath: applications/prowlarr/volumes/config
+              subPath: applications/prometheus-pve-exporter/volumes
       tolerations:
         - key: "node.kubernetes.io/unreachable"
           operator: "Exists"
@@ -43,16 +43,16 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: prowlarr-service
+  name: prometheus-pve-exporter-service
   annotations:
     metallb.io/address-pool: metallbaddresspool
     metallb.io/allow-shared-ip: "shared-ip"
 spec:
   type: LoadBalancer
   selector:
-    app: prowlarr
+    app: prometheus-pve-exporter
   ports:
     - name: http
-      port: 9696
-      targetPort: 9696
+      port: 9221
+      targetPort: 9221
       protocol: TCP
