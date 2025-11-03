@@ -48,14 +48,14 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
     disk {
       datastore_id = var.datastore_id
       interface    = var.interface
-      import_from  = proxmox_virtual_environment_download_file.latest_ubuntu_24_noble_qcow2_img.id
+      import_from  = data.proxmox_virtual_environment_file.latest_ubuntu_24_noble_qcow2_img.id
       size = var.disk_size_gb
     }
     network_device {
       bridge = var.network_bridge
     }
     lifecycle {
-      ignore_changes = [ disk, node_name, agent ]
+      ignore_changes = [ disk, node_name, agent, initialization, cpu, memory ]
     }
     provisioner "remote-exec" {
       when = create
@@ -69,7 +69,7 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
         timeout     = "2m"
       }
     }
-    initialization {
+    initialization { 
       user_data_file_id = proxmox_virtual_environment_file.user_data_cloud_config[count.index].id
       datastore_id = var.image_datastore_id
       ip_config {
@@ -79,12 +79,12 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
       }
     }
 }
-resource "proxmox_virtual_environment_download_file" "latest_ubuntu_24_noble_qcow2_img" {
+
+data "proxmox_virtual_environment_file" "latest_ubuntu_24_noble_qcow2_img" {
+  node_name = var.proxmox_node_name
+  datastore_id = "iso-storage"
   content_type = "import"
-  datastore_id = var.image_datastore_id
-  node_name    = var.image_node_name
-  url = var.image_url
-  file_name = var.image_file_name
+  file_name    = "ubuntu-noble-amd64.qcow2"
 }
 
 data "local_sensitive_file" "ssh_key" {

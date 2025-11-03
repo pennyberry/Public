@@ -1,0 +1,51 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: descheduler-policy-configmap
+  namespace: kube-system
+data:
+  policy.yaml: |
+    apiVersion: "descheduler/v1alpha2"
+    kind: "DeschedulerPolicy"
+    profiles:
+      - name: ProfileName
+        pluginConfig:
+        - name: "DefaultEvictor"
+        - name: "RemovePodsViolatingInterPodAntiAffinity"
+        - name: "RemoveDuplicates"
+        - name: "HighNodeUtilization"
+          args:
+            evictableNamespaces:
+              exclude:
+              - "kube-system"
+              - "metallb-system"
+            thresholds:
+              "cpu" : 20
+              "memory": 20
+              "pods": 15
+          evictionModes:
+            - "OnlyThresholdingResources"
+        - name: "LowNodeUtilization"
+          args:
+            evictableNamespaces:
+              exclude:
+              - "kube-system"
+              - "metallb-system"
+            thresholds:
+              "cpu" : 10
+              "memory": 10
+              "pods": 6
+            targetThresholds:
+              "cpu" : 30
+              "memory": 25
+              "pods": 15
+        plugins:
+          balance:
+            enabled:
+              - "LowNodeUtilization"
+              - "RemoveDuplicates"
+              - "HighNodeUtilization"
+          deschedule:
+            enabled:
+              - "RemovePodsViolatingInterPodAntiAffinity"

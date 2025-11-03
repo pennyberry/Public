@@ -116,7 +116,7 @@ variable "image_file_name" {
 variable "image_datastore_id" {
     description = "Datastore used to store the downloaded image before import."
     type        = string
-    default     = "nvme"
+    default     = "iso-storage"
 }
 
 variable "image_node_name" {
@@ -141,7 +141,7 @@ variable "number_of_vms" {
 variable "remote_exec_script" {
   description = "script to run via ssh after the machine has completed provisioning."
   type = string
-  default = ""
+  default = "hostname"
 }
 variable "disk_size_gb" {
   description = "Size of the VM disk in GB."
