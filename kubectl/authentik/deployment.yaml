@@ -1,0 +1,241 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgresql
+  labels:
+    app: postgresql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgresql
+  template:
+    metadata:
+      labels:
+        app: postgresql
+    spec:
+      containers:
+        - name: postgresql
+          image: docker.io/library/postgres:16-alpine
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - secretRef:
+                name: authentik-secrets
+          volumeMounts:
+            - name: nfs
+              mountPath: /var/lib/postgresql/data
+              subPath: applications/authentik-2/volumes/pgdatabase
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Gi"
+              cpu: "900m"
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  labels:
+    app: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: docker.io/library/redis:latest
+          # args: ["--save", "60", "1", "--loglevel", "warning"]
+          envFrom:
+            - secretRef:
+                name: authentik-secrets
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - name: nfs
+              mountPath: /data
+              subPath: applications/authentik-2/volumes/redis
+          resources:
+            requests:
+              memory: "56Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "900m"
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentik-server
+  labels:
+    app: authentik-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentik-server
+  template:
+    metadata:
+      labels:
+        app: authentik-server
+    spec:
+      containers:
+        - name: authentik-server
+          image: ghcr.io/goauthentik/server:2025.8.4          
+          args:
+            - server
+          envFrom:
+            - secretRef:
+                name: authentik-secrets
+          volumeMounts:
+            - name: nfs
+              mountPath: /media
+              subPath: applications/authentik-2/volumes/media
+            - name: nfs
+              mountPath: /templates
+              subPath: applications/authentik-2/volumes/custom-templates
+          ports:
+            - name: http
+              containerPort: 9000
+              protocol: TCP
+            - name: https
+              containerPort: 9443
+              protocol: TCP
+            - name: metrics
+              containerPort: 9300
+              protocol: TCP
+          resources:
+            requests:
+              memory: "720Mi"
+              cpu: "100m"
+            limits:
+              memory: "2Gi"
+              cpu: "900m"
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentik-worker
+  labels:
+    app: authentik-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentik-worker
+  template:
+    metadata:
+      labels:
+        app: authentik-worker
+    spec:
+      containers:
+        - name: authentik-worker
+          image: ghcr.io/goauthentik/server:2025.8.4
+          args:
+            - worker
+          envFrom:
+            - secretRef:
+                name: authentik-secrets
+          ports:
+            - name: http
+              containerPort: 9000
+              protocol: TCP
+            - name: metrics
+              containerPort: 9300
+              protocol: TCP
+          volumeMounts:
+            - name: nfs
+              mountPath: /media
+              subPath: applications/authentik-2/volumes/media
+            - name: nfs
+              mountPath: /certs
+              subPath: applications/authentik-2/volumes/certs
+            - name: nfs
+              mountPath: /templates
+              subPath: applications/authentik-2/volumes/custom-templates
+          resources:
+            requests:
+              memory: "720Mi"
+              cpu: "100m"
+            limits:
+              memory: "1Gi"
+              cpu: "900m"
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql
+  labels:
+    app: postgresql
+spec:
+  type: ClusterIP
+  ports:
+    - name: postgresql
+      port: 5432
+      targetPort: 5432
+  selector:
+    app: postgresql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentik-server
+  annotations:
+    metallb.io/address-pool: metallbaddresspool
+    metallb.io/allow-shared-ip: "shared-ip"
+  labels:
+    app: authentik-server
+spec:
+  type: LoadBalancer
+  selector:
+    app: authentik-server
+  ports:
+    - name: http
+      port: 9000
+      targetPort: 9000
+      protocol: TCP
+    - name: https
+      port: 9443
+      targetPort: 9443
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  labels:
+    app: redis
+spec:
+  type: ClusterIP
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379
+  selector:
+    app: redis

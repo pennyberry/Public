@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - deployment.yaml
+
+secretGenerator:
+  - name: authentik-secrets
+    envs:
+      - env-vars.env
+    literals:
+      - AUTHENTIK_REDIS__HOST=redis
+      - AUTHENTIK_POSTGRESQL__HOST=postgresql
+      - AUTHENTIK_POSTGRESQL__USER=authentik
+      - AUTHENTIK_POSTGRESQL__NAME=authentik
+      - AUTHENTIK_POSTGRESQL__PORT=5432
+      - AUTHENTIK_LOG_LEVEL=trace
+      - AUTHENTIK_ERROR_REPORTING__ENABLED=true
+      - POSTGRES_USER=authentik
+      - POSTGRES_DB=authentik
+      - AUTHENTIK_ENABLED=true
+
+generatorOptions:
+  disableNameSuffixHash: true
