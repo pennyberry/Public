@@ -8,6 +8,10 @@ secretGenerator:
   - name: grafana-secrets
     envs:
       - env-vars.env
+    literals:
+      - GF_AUTH_GENERIC_OAUTH_ENABLED=true
+      - GF_AUTH_GENERIC_OAUTH_SCOPES=openid profile email
+      - GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH=contains(groups[*], 'Grafana Admins') && 'Admin' || contains(groups[*], 'Grafana Editors') && 'Editor' || 'Viewer'
 
 generatorOptions:
   disableNameSuffixHash: true

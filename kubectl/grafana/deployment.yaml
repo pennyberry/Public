@@ -15,49 +15,9 @@ spec:
       containers:
         - name: grafana
           image: grafana/grafana-enterprise
-          env:
-            - name: GF_SERVER_ROOT_URL
-              valueFrom:
-                secretKeyRef:
-                  name: grafana-secrets
-                  key: GF_SERVER_ROOT_URL
-            - name: GF_SERVER_DOMAIN
-              valueFrom:
-                secretKeyRef:
-                  name: grafana-secrets
-                  key: GF_SERVER_DOMAIN
-            - name: GF_AUTH_GENERIC_OAUTH_CLIENT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: grafana-secrets
-                  key: GF_AUTH_GENERIC_OAUTH_CLIENT_ID
-            - name: GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: grafana-secrets
-                  key: GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
-            - name: GF_AUTH_GENERIC_OAUTH_AUTH_URL
-              valueFrom:
-                secretKeyRef:
-                  name: grafana-secrets
-                  key: GF_AUTH_GENERIC_OAUTH_AUTH_URL
-            - name: GF_AUTH_GENERIC_OAUTH_TOKEN_URL
-              valueFrom:
-                secretKeyRef:
-                  name: grafana-secrets
-                  key: GF_AUTH_GENERIC_OAUTH_TOKEN_URL
-            - name: GF_AUTH_GENERIC_OAUTH_API_URL
-              valueFrom:
-                secretKeyRef:
-                  name: grafana-secrets
-                  key: GF_AUTH_GENERIC_OAUTH_API_URL
-            - name: GF_AUTH_SIGNOUT_REDIRECT_URL
-              valueFrom:
-                secretKeyRef:
-                  name: grafana-secrets
-                  key: GF_AUTH_SIGNOUT_REDIRECT_URL
-            - name: GF_AUTH_GENERIC_OAUTH_ENABLED
-              value: "true"
+          envFrom:
+            - secretRef:
+                name: grafana-secrets
           resources:
             requests:
               memory: "256Mi"
