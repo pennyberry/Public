@@ -21,8 +21,8 @@ data:
               - "kube-system"
               - "metallb-system"
             thresholds:
-              "cpu" : 20
-              "memory": 20
+              "cpu" : 30
+              "memory": 30
               "pods": 15
           evictionModes:
             - "OnlyThresholdingResources"
