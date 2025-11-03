@@ -29,26 +29,9 @@ spec:
                       capabilities:
                           add:
                               - 'NET_ADMIN'
-                  env:
-                      - name: VPN_SERVICE_PROVIDER
-                        value: protonvpn
-                      - name: VPN_TYPE
-                        value: wireguard
-                      - name: SERVER_COUNTRIES
-                        value: United States
-                      - name: PORT_FORWARD_ONLY
-                        value: on
-                      - name: VPN_PORT_FORWARDING_PROVIDER
-                        value: protonvpn
-                      - name: VPN_PORT_FORWARDING
-                        value: on
-                      - name: DOT
-                        value: off
-                      - name: WIREGUARD_PRIVATE_KEY
-                        valueFrom:
-                            secretKeyRef:
-                                name: gluetun-secrets
-                                key: PRIVATEKEY
+                  envFrom:
+                    - secretRef:
+                        name: gluetun-secrets
                 - name: curlpodtest
                   image: alpine/curl
                   ports:
@@ -76,13 +59,9 @@ spec:
                     limits:
                       memory: "2Gi"
                       cpu: "1000m"
-                  env:
-                    - name: PUID
-                      value: "0"
-                    - name: PGID
-                      value: "0"
-                    - name: WEBUI_PORT
-                      value: "8080"
+                  envFrom:
+                    - secretRef:
+                        name: gluetun-secrets
                   livenessProbe:
                     exec:
                       command:
