@@ -42,6 +42,13 @@ spec:
             - mountPath: /etc/letsencrypt
               name: nfs
               subPath: applications/nginx-proxy-manager-2/volumes/letsencrypt
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "10m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"                    
       volumes:
         - name: nfs
           persistentVolumeClaim:
@@ -99,6 +106,13 @@ spec:
             - mountPath: /var/lib/mysql
               name: nfs
               subPath: applications/nginx-proxy-manager-2/volumes/mysql
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "10m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"             
       volumes:
         - name: nfs
           persistentVolumeClaim:
@@ -122,7 +136,7 @@ metadata:
   annotations:
     metallb.io/address-pool: metallbaddresspool-nginx
 spec:
-  externalTrafficPolicy: Cluster
+  externalTrafficPolicy: Local
   ports:
     - port: 81
       targetPort: 81
