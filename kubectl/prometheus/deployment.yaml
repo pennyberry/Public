@@ -20,7 +20,7 @@ spec:
               memory: "128Mi"
               cpu: "10m"
             limits:
-              memory: "256Mi"
+              memory: "1Gi"
               cpu: "1000m"  
           volumeMounts:
             - mountPath: /etc/prometheus/prometheus.yml
