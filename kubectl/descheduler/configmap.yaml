@@ -14,18 +14,18 @@ data:
         - name: "DefaultEvictor"
         - name: "RemovePodsViolatingInterPodAntiAffinity"
         - name: "RemoveDuplicates"
-        - name: "HighNodeUtilization"
-          args:
-            evictableNamespaces:
-              exclude:
-              - "kube-system"
-              - "metallb-system"
-            thresholds:
-              "cpu" : 30
-              "memory": 30
-              "pods": 15
-          evictionModes:
-            - "OnlyThresholdingResources"
+        # - name: "HighNodeUtilization"
+        #   args:
+        #     evictableNamespaces:
+        #       exclude:
+        #       - "kube-system"
+        #       - "metallb-system"
+        #     thresholds:
+        #       "cpu" : 30
+        #       "memory": 25
+        #       "pods": 10
+        #   evictionModes:
+        #     - "OnlyThresholdingResources"
         - name: "LowNodeUtilization"
           args:
             evictableNamespaces:
@@ -35,17 +35,17 @@ data:
             thresholds:
               "cpu" : 10
               "memory": 10
-              "pods": 6
+              "pods": 8
             targetThresholds:
               "cpu" : 30
               "memory": 25
-              "pods": 15
+              "pods": 13
         plugins:
           balance:
             enabled:
               - "LowNodeUtilization"
               - "RemoveDuplicates"
-              - "HighNodeUtilization"
+              # - "HighNodeUtilization"
           deschedule:
             enabled:
               - "RemovePodsViolatingInterPodAntiAffinity"
