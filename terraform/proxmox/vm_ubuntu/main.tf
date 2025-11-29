@@ -55,7 +55,7 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
       bridge = var.network_bridge
     }
     lifecycle {
-      ignore_changes = [ disk, node_name, agent, initialization, cpu, memory ]
+      ignore_changes = [ disk, node_name, agent, initialization, cpu, memory, hostpci ]
     }
     provisioner "remote-exec" {
       when = create
