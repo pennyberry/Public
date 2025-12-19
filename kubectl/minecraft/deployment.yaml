@@ -22,10 +22,8 @@ spec:
               value: "8192M"
             - name: ONLINE_MODE
               value: "FALSE" 
-            # - name: USE_AIKAR_FLAGS
-            #   value: "true"
-            # - name: USE_MEOWICE_FLAGS
-            #   value: "true"              
+            - name: TYPE
+              value: "FABRIC"              
           resources:
             requests:
               memory: "8192Mi"
@@ -33,10 +31,10 @@ spec:
             limits:
               memory: "8192Mi"
               cpu: "1000m"  
-          # volumeMounts:
-          #   - mountPath: /data
-          #     name: nfs
-          #     subPath: applications/minecraft/volumes/data
+          volumeMounts:
+            - mountPath: /data
+              name: nfs
+              subPath: applications/minecraft/volumes/data
       tolerations:
         - key: "node.kubernetes.io/unreachable"
           operator: "Exists"
