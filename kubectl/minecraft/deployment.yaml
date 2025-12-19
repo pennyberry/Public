@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minecraft
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minecraft
+  template:
+    metadata:
+      labels:
+        app: minecraft
+    spec:
+      containers:
+        - name: minecraft
+          image: itzg/minecraft-server:latest            
+          env:
+            - name: EULA
+              value: "TRUE"
+            - name: MEMORY
+              value: "8192M"
+            - name: ONLINE_MODE
+              value: "FALSE" 
+            # - name: USE_AIKAR_FLAGS
+            #   value: "true"
+            # - name: USE_MEOWICE_FLAGS
+            #   value: "true"              
+          resources:
+            requests:
+              memory: "8192Mi"
+              cpu: "10m"
+            limits:
+              memory: "8192Mi"
+              cpu: "1000m"  
+          # volumeMounts:
+          #   - mountPath: /data
+          #     name: nfs
+          #     subPath: applications/minecraft/volumes/data
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15          
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minecraft-service
+  annotations:
+    metallb.io/address-pool: metallbaddresspool
+    metallb.io/allow-shared-ip: "shared-ip"
+spec:
+  type: LoadBalancer
+  selector:
+    app: minecraft
+  ports:
+    - name: minecraft
+      port: 25565
+      targetPort: 25565
+      protocol: TCP
