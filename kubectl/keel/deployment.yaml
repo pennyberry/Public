@@ -131,10 +131,10 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             # Basic auth (to enable UI/API)
-            - name: BASIC_AUTH_USER
-              value: "joe"
-            - name: BASIC_AUTH_PASSWORD
-              value: "HelloWorld123"
+            # - name: BASIC_AUTH_USER
+            #   value: "temp"
+            # - name: BASIC_AUTH_PASSWORD
+            #   value: "redacted"
             # Enable insecure registries
             - name: INSECURE_REGISTRY
               value: "true"
