@@ -25,7 +25,7 @@ spec:
           volumeMounts:
             - name: nfs
               mountPath: /var/lib/postgresql/data
-              subPath: applications/authentik-2/volumes/pgdatabase
+              subPath: applications/authentik/volumes/pgdatabase
           resources:
             requests:
               memory: "256Mi"
@@ -66,7 +66,7 @@ spec:
           volumeMounts:
             - name: nfs
               mountPath: /data
-              subPath: applications/authentik-2/volumes/redis
+              subPath: applications/authentik/volumes/redis
           resources:
             requests:
               memory: "56Mi"
@@ -107,10 +107,10 @@ spec:
           volumeMounts:
             - name: nfs
               mountPath: /media
-              subPath: applications/authentik-2/volumes/media
+              subPath: applications/authentik/volumes/media
             - name: nfs
               mountPath: /templates
-              subPath: applications/authentik-2/volumes/custom-templates
+              subPath: applications/authentik/volumes/custom-templates
           ports:
             - name: http
               containerPort: 9000
@@ -168,13 +168,13 @@ spec:
           volumeMounts:
             - name: nfs
               mountPath: /media
-              subPath: applications/authentik-2/volumes/media
+              subPath: applications/authentik/volumes/media
             - name: nfs
               mountPath: /certs
-              subPath: applications/authentik-2/volumes/certs
+              subPath: applications/authentik/volumes/certs
             - name: nfs
               mountPath: /templates
-              subPath: applications/authentik-2/volumes/custom-templates
+              subPath: applications/authentik/volumes/custom-templates
           resources:
             requests:
               memory: "720Mi"
