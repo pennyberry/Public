@@ -23,7 +23,11 @@ spec:
             - name: ONLINE_MODE
               value: "FALSE" 
             - name: TYPE
-              value: "FABRIC"              
+              value: "FABRIC"
+            - name: MODRINTH_PROJECTS
+              value: "OhduvhIc"
+            - name: MODRINTH_DOWNLOAD_DEPENDENCIES
+              value: "required"
           resources:
             requests:
               memory: "8192Mi"
