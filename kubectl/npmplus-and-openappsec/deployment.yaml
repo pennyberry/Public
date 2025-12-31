@@ -1,0 +1,159 @@
+apiVersion: apps/v1
+metadata:
+  name: npm-plus
+kind: Deployment
+spec:
+  selector:
+    matchLabels:
+      tag: npm-plus
+  template:
+    metadata:
+      labels:
+        tag: npm-plus
+    spec:
+      containers:
+        - env:
+          - name: LOGROTATE
+            value: "true"
+          - name: TZ
+            value: "America/New_York"
+          - name: ACME_EMAIL
+            valueFrom:
+              secretKeyRef:
+                name: npm-plus-secret
+                key: acme_email
+          image: docker.io/zoeyvid/npmplus:latest
+          name: npm-plus
+          ports:
+            - containerPort: 80
+              protocol: TCP
+            - containerPort: 81
+              protocol: TCP
+            - containerPort: 443
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /data
+              name: nfs
+              subPath: applications/npm-plus/volumes/data
+            - mountPath: /etc/letsencrypt
+              name: nfs
+              subPath: applications/npm-plus/volumes/letsencrypt
+            - mountPath: /dev/shm/check-point
+              name: shm
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "10m"
+            limits:
+              memory: "1024Mi"
+              cpu: "500m"                    
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+        - name: shm
+          emptyDir:
+            medium: Memory
+      restartPolicy: Always
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      hostIPC: true      
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15
+---
+apiVersion: apps/v1
+metadata:
+  name: crowdsec
+kind: Deployment
+spec:
+  selector:
+    matchLabels:
+      tag: npm-plus
+  template:
+    metadata:
+      labels:
+        tag: npm-plus
+    spec:
+      containers:
+        - env:
+          - name: COLLECTIONS
+            value: "ZoeyVid/npmplus"
+          - name: USE_WAL
+            value: "True"            
+          image: docker.io/crowdsecurity/crowdsec:latest
+          name: crowdsec
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 7422
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /etc/crowdsec
+              name: nfs
+              subPath: applications/crowdsec/volumes/
+            - mountPath: /var/lib/crowdsec/data
+              name: nfs
+              subPath: applications/crowdsec/volumes/data
+            - mountPath: /opt/npmplus/nginx/logs
+              name: nfs
+              subPath: applications/npm-plus/volumes/data/nginx/
+              readOnly: true
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "10m"
+            limits:
+              memory: "1024Mi"
+              cpu: "500m"                    
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+      restartPolicy: Always
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      hostIPC: true    
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: npm-plus
+  annotations:
+    metallb.io/address-pool: metallbaddresspool-nginx
+spec:
+  externalTrafficPolicy: Local
+  ports:
+    - port: 81
+      targetPort: 81
+      name: admin
+    - port: 80
+      targetPort: 80
+      name: http
+    - port: 443
+      targetPort: 443
+      name: https
+    - port: 8080
+      targetPort: 8080
+      name: http-openappsec
+    - port: 7422
+      targetPort: 7422
+      name: openappsec-api      
+  selector:
+    tag: npm-plus
+  type: LoadBalancer
