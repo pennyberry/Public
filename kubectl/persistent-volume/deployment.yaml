@@ -12,3 +12,16 @@ spec:
   nfs:
     server: enter-your-nfs-server-ip-here
     path: /your/nfs/path/
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: truenas-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 39Ti
+  storageClassName: nfs
+  volumeName: truenas

@@ -205,9 +205,24 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: redis
+  labels:
+    app: redis
+spec:
+  type: ClusterIP
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379
+  selector:
+    app: redis
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: authentik-server
   annotations:
-    metallb.io/address-pool: metallbaddresspool
+    metallb.io/address-pool: "internal-pool"
     metallb.io/allow-shared-ip: "shared-ip"
   labels:
     app: authentik-server
@@ -225,17 +240,34 @@ spec:
       targetPort: 9443
       protocol: TCP
 ---
-apiVersion: v1
-kind: Service
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
-  name: redis
-  labels:
-    app: redis
+  name: authentik-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
 spec:
-  type: ClusterIP
-  ports:
-    - name: redis
-      port: 6379
-      targetPort: 6379
-  selector:
-    app: redis
+  tls:
+    - hosts:
+      - authentik.joeberry.org
+  rules:
+  - host: authentik.joeberry.org
+    http:
+      paths:
+      - backend:
+          service:
+            name: authentik-server            
+            port:
+              number: 9443
+        path: /
+        pathType: Prefix
+      - backend:
+          service:
+            name: authentik-server            
+            port:
+              number: 9000
+        path: /
+        pathType: Prefix
+            
+       

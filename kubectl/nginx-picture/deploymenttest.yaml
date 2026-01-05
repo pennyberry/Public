@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-picture
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-picture
+  template:
+    metadata:
+      labels:
+        app: nginx-picture
+    spec:
+      containers:
+        - name: nginx-picture
+          image:  lscr.io/linuxserver/nginx:latest
+      hostNetwork: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-picture
+  annotations:
+    metallb.io/address-pool: external-pool
+    metallb.io/allow-shared-ip: "shared-ip"
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx-picture
+  ports:
+    - name: http
+      port: 85
+      targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vault
+  annotations:
+    metallb.io/address-pool: internal-pool
+    metallb.io/allow-shared-ip: "shared-ip"
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 8200
+      targetPort: 8200
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: vault
+  labels:
+    kubernetes.io/service-name: vault
+addressType: IPv4
+ports:
+  - name: http
+    protocol: TCP
+    port: 8200
+endpoints:
+  - addresses:
+      - "192.168.1.248"
+    conditions:
+      serving: true
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: external-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+spec:
+  tls:
+    - hosts:
+      - testing456.joeberry.org
+  rules:
+  - host: testing456.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-picture
+            port:
+              number: 85
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: internal-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+spec:
+  rules:
+  - host: vault.internal
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: vault
+            port:
+              number: 8200

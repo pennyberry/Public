@@ -1,0 +1,32 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+    name: external-pool
+    namespace: metallb-system
+spec:
+    serviceAllocation:
+        priority: 1
+    addresses:
+        - enter-a-reserved--internal-ipv4-address-here/32
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+    name: internal-pool
+    namespace: metallb-system
+spec:
+    serviceAllocation:
+        priority: 2
+    autoAssign: false
+    addresses:
+        - enter-a-different-reserved--internal-ipv4-address-here/32
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+    name: layer2advertisement
+    namespace: metallb-system
+spec:
+    ipAddressPools:
+        - internal-pool
+        - external-pool

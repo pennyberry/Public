@@ -1,0 +1,19 @@
+module "jellyfin" {
+    source = "../../vm_ubuntu"
+    proxmox_vm_name = var.proxmox_vm_name
+    username = var.username
+    SSH_PASSWORD = var.SSH_PASSWORD
+    agent_enabled = var.agent_enabled
+    cpu_cores = var.cpu_cores
+    cpu_sockets = var.cpu_sockets
+    cpu_type = var.cpu_type
+    memory = var.memory
+    disk_size_gb = var.disk_size_gb
+    proxmox_node_name = var.proxmox_node_name
+    datastore_id = var.datastore_id
+    image_datastore_id = var.image_datastore_id
+    image_node_name = var.image_node_name
+    network_bridge = var.network_bridge
+    number_of_vms = var.number_of_vms
+    interface = var.interface
+}
