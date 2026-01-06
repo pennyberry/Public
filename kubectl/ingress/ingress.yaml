@@ -1,3 +1,6 @@
+##
+# Jellyfin Ingress Configuration
+##
 ---
 apiVersion: v1
 kind: Service
@@ -33,7 +36,7 @@ endpoints:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: external-ingress
+  name: jellyfin-ingress
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
@@ -52,3 +55,64 @@ spec:
             name: jellyfin
             port:
               number: 8096
+##
+# Proxmox Ingress Configuration
+##
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxmox
+  annotations:
+    metallb.io/address-pool: internal-pool
+    metallb.io/allow-shared-ip: "shared-ip"
+    traefik.ingress.kubernetes.io/service.serversscheme: https
+    traefik.ingress.kubernetes.io/service.serverstransport: kube-system-skipverify@kubernetescrd    
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 8006
+      targetPort: 8006
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: proxmox
+  labels:
+    kubernetes.io/service-name: proxmox
+addressType: IPv4
+ports:
+  - name: http
+    protocol: TCP
+    port: 8006
+endpoints:
+  - addresses:
+      - "192.168.1.79"
+    conditions:
+      serving: true
+    
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: proxmox-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd
+    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+spec:
+  tls:
+    - hosts:
+      - proxmox.joeberry.org
+  rules:
+  - host: proxmox.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: proxmox
+            port:
+              number: 8006
