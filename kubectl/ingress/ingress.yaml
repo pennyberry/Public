@@ -116,3 +116,64 @@ spec:
             name: proxmox
             port:
               number: 8006
+##
+# Truenas Ingress Configuration
+##
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: truenas
+  annotations:
+    metallb.io/address-pool: internal-pool
+    metallb.io/allow-shared-ip: "shared-ip"
+    traefik.ingress.kubernetes.io/service.serversscheme: https
+    traefik.ingress.kubernetes.io/service.serverstransport: kube-system-skipverify@kubernetescrd    
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 443
+      targetPort: 443
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: truenas
+  labels:
+    kubernetes.io/service-name: truenas
+addressType: IPv4
+ports:
+  - name: http
+    protocol: TCP
+    port: 443
+endpoints:
+  - addresses:
+      - "192.168.1.213"
+    conditions:
+      serving: true
+    
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: truenas-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd
+    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+spec:
+  tls:
+    - hosts:
+      - truenas.joeberry.org
+  rules:
+  - host: truenas.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: truenas
+            port:
+              number: 443
