@@ -177,3 +177,64 @@ spec:
             name: truenas
             port:
               number: 443
+##
+# OPNSense Ingress Configuration
+##
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opnsense
+  annotations:
+    metallb.io/address-pool: internal-pool
+    metallb.io/allow-shared-ip: "shared-ip"
+    traefik.ingress.kubernetes.io/service.serversscheme: https
+    traefik.ingress.kubernetes.io/service.serverstransport: kube-system-skipverify@kubernetescrd    
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 10443
+      targetPort: 10443
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: opnsense
+  labels:
+    kubernetes.io/service-name: opnsense
+addressType: IPv4
+ports:
+  - name: http
+    protocol: TCP
+    port: 10443
+endpoints:
+  - addresses:
+      - "192.168.1.1"
+    conditions:
+      serving: true
+    
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: opnsense-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd
+    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+spec:
+  tls:
+    - hosts:
+      - opnsense.joeberry.org
+  rules:
+  - host: opnsense.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: opnsense
+            port:
+              number: 10443              
