@@ -14,6 +14,20 @@ spec:
     path: /your/nfs/path/
 ---
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: truenas2
+spec:
+  capacity:
+    storage: 39Ti
+  storageClassName: nfs
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: enter-your-nfs-server-ip-here
+    path: /your/nfs/path/ 
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: truenas-pvc
@@ -25,3 +39,17 @@ spec:
       storage: 39Ti
   storageClassName: nfs
   volumeName: truenas
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: truenas-pvc2
+  namespace: kube-system
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 39Ti
+  storageClassName: nfs
+  volumeName: truenas2
