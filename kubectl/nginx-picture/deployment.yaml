@@ -45,7 +45,7 @@ kind: Service
 metadata:
   name: nginx-picture-service-tcp
   annotations:
-    metallb.io/address-pool: metallbaddresspool
+    metallb.io/address-pool: internal-pool
     metallb.io/allow-shared-ip: "shared-ip"
 spec:
   type: LoadBalancer
@@ -60,3 +60,26 @@ spec:
       port: 4444
       targetPort: 443
       protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: picture-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+spec:
+  tls:
+    - hosts:
+      - picture.joeberry.org
+  rules:
+  - host: picture.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-picture-service-tcp
+            port:
+              number: 8084         

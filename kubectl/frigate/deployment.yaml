@@ -54,7 +54,7 @@ kind: Service
 metadata:
   name: frigate-service-tcp
   annotations:
-    metallb.io/address-pool: metallbaddresspool
+    metallb.io/address-pool: internal-pool
     metallb.io/allow-shared-ip: "shared-ip"
 spec:
   type: LoadBalancer
@@ -83,7 +83,7 @@ kind: Service
 metadata:
   name: frigate-service-udp
   annotations:
-    metallb.io/address-pool: metallbaddresspool
+    metallb.io/address-pool: internal-pool
     metallb.io/allow-shared-ip: "shared-ip"
 spec:
   type: LoadBalancer
@@ -94,3 +94,26 @@ spec:
       port: 8555
       targetPort: 8555
       protocol: UDP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: frigate-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+spec:
+  tls:
+    - hosts:
+      - frigate.joeberry.org
+  rules:
+  - host: frigate.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: authentik-server
+            port:
+              number: 9000

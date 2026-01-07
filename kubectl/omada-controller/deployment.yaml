@@ -111,8 +111,10 @@ kind: Service
 metadata:
   name: omada-svc-tcp
   annotations:
-    metallb.io/address-pool: metallbaddresspool
+    metallb.io/address-pool: internal-pool
     metallb.io/allow-shared-ip: "shared-ip"
+    traefik.ingress.kubernetes.io/service.serversscheme: https
+    traefik.ingress.kubernetes.io/service.serverstransport: kube-system-skipverify@kubernetescrd        
 spec:
   type: LoadBalancer
   selector:
@@ -164,7 +166,7 @@ kind: Service
 metadata:
   name: omada-svc-udp
   annotations:
-    metallb.io/address-pool: metallbaddresspool
+    metallb.io/address-pool: internal-pool
     metallb.io/allow-shared-ip: "shared-ip"
 spec:
   type: LoadBalancer
@@ -183,3 +185,27 @@ spec:
       port: 19810
       targetPort: 19810
       protocol: UDP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: omada-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd
+    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+spec:
+  tls:
+    - hosts:
+      - omada.joeberry.org
+  rules:
+  - host: omada.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: omada-svc-tcp
+            port:
+              number: 8043

@@ -45,7 +45,7 @@ kind: Service
 metadata:
   name: prowlarr-service
   annotations:
-    metallb.io/address-pool: metallbaddresspool
+    metallb.io/address-pool: internal-pool
     metallb.io/allow-shared-ip: "shared-ip"
 spec:
   type: LoadBalancer
@@ -56,3 +56,26 @@ spec:
       port: 9696
       targetPort: 9696
       protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: prowlarr-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+spec:
+  tls:
+    - hosts:
+      - prowlarr.joeberry.org
+  rules:
+  - host: prowlarr.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: authentik-server
+            port:
+              number: 9000

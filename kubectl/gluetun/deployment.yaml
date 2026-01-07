@@ -85,7 +85,7 @@ kind: Service
 metadata:
   name: gluetun
   annotations:
-    metallb.io/address-pool: metallbaddresspool
+    metallb.io/address-pool: internal-pool
     metallb.io/allow-shared-ip: "shared-ip"
 spec:
   type: LoadBalancer
@@ -95,4 +95,27 @@ spec:
     - name: manage-http
       port: 8080
       targetPort: 8080
-
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: qbittorrent-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd
+    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+spec:
+  tls:
+    - hosts:
+      - qbittorrent.joeberry.org
+  rules:
+  - host: qbittorrent.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: gluetun
+            port:
+              number: 8080          

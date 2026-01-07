@@ -88,7 +88,7 @@ kind: Service
 metadata:
   name: openwebui-service-tcp
   annotations:
-    metallb.io/address-pool: metallbaddresspool
+    metallb.io/address-pool: internal-pool
     metallb.io/allow-shared-ip: "shared-ip"
 spec:
   type: LoadBalancer
@@ -99,3 +99,26 @@ spec:
       port: 3022
       targetPort: 8080
       protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: openwebui-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+spec:
+  tls:
+    - hosts:
+      - openwebui.joeberry.org
+  rules:
+  - host: openwebui.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: authentik-server
+            port:
+              number: 9000         

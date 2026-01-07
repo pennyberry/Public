@@ -86,7 +86,7 @@ kind: Service
 metadata:
   name: hashicorp-vault-service-tcp
   annotations:
-    metallb.io/address-pool: metallbaddresspool
+    metallb.io/address-pool: internal-pool
     metallb.io/allow-shared-ip: "shared-ip"
 spec:
   type: LoadBalancer
@@ -97,3 +97,27 @@ spec:
       port: 8200
       targetPort: 8200
       protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vault-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd
+    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+spec:
+  tls:
+    - hosts:
+      - vault.joeberry.org
+  rules:
+  - host: vault.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hashicorp-vault-service-tcp
+            port:
+              number: 8200      
