@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: postgresql
-          image: docker.io/library/postgres:16-alpine
+          image: docker.io/library/postgres:17.7-bookworm
           ports:
             - containerPort: 5432
           envFrom:
@@ -25,7 +25,7 @@ spec:
           volumeMounts:
             - name: nfs
               mountPath: /var/lib/postgresql/data
-              subPath: applications/authentik/volumes/pgdatabase
+              subPath: applications/authentik-4/volumes/pgdatabase             
           resources:
             requests:
               memory: "256Mi"
@@ -37,48 +37,6 @@ spec:
         - name: nfs
           persistentVolumeClaim:
             claimName: truenas-pvc
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: redis
-  labels:
-    app: redis
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: redis
-  template:
-    metadata:
-      labels:
-        app: redis
-    spec:
-      containers:
-        - name: redis
-          image: docker.io/library/redis:latest
-          # args: ["--save", "60", "1", "--loglevel", "warning"]
-          envFrom:
-            - secretRef:
-                name: authentik-secrets
-          ports:
-            - containerPort: 6379
-          volumeMounts:
-            - name: nfs
-              mountPath: /data
-              subPath: applications/authentik/volumes/redis
-          resources:
-            requests:
-              memory: "56Mi"
-              cpu: "100m"
-            limits:
-              memory: "128Mi"
-              cpu: "900m"
-      volumes:
-        - name: nfs
-          persistentVolumeClaim:
-            claimName: truenas-pvc
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -98,7 +56,7 @@ spec:
     spec:
       containers:
         - name: authentik-server
-          image: ghcr.io/goauthentik/server:2025.8.4          
+          image: ghcr.io/goauthentik/server:2025.10.3
           args:
             - server
           envFrom:
@@ -107,10 +65,10 @@ spec:
           volumeMounts:
             - name: nfs
               mountPath: /media
-              subPath: applications/authentik/volumes/media
+              subPath: applications/authentik-4/volumes/media
             - name: nfs
               mountPath: /templates
-              subPath: applications/authentik/volumes/custom-templates
+              subPath: applications/authentik-4/volumes/custom-templates
           ports:
             - name: http
               containerPort: 9000
@@ -132,7 +90,6 @@ spec:
         - name: nfs
           persistentVolumeClaim:
             claimName: truenas-pvc
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -152,9 +109,14 @@ spec:
     spec:
       containers:
         - name: authentik-worker
-          image: ghcr.io/goauthentik/server:2025.8.4
+          image: ghcr.io/goauthentik/server:2025.10.3
           args:
             - worker
+          env:
+            - name: AUTHENTIK_LISTEN__HTTP
+              value: "0.0.0.0:9000"
+            - name: AUTHENTIK_LISTEN__METRICS
+              value: "0.0.0.0:9300"          
           envFrom:
             - secretRef:
                 name: authentik-secrets
@@ -168,13 +130,13 @@ spec:
           volumeMounts:
             - name: nfs
               mountPath: /media
-              subPath: applications/authentik/volumes/media
+              subPath: applications/authentik-4/volumes/media
             - name: nfs
               mountPath: /certs
-              subPath: applications/authentik/volumes/certs
+              subPath: applications/authentik-4/volumes/certs
             - name: nfs
               mountPath: /templates
-              subPath: applications/authentik/volumes/custom-templates
+              subPath: applications/authentik-4/volumes/custom-templates
           resources:
             requests:
               memory: "720Mi"
@@ -201,21 +163,6 @@ spec:
       targetPort: 5432
   selector:
     app: postgresql
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: redis
-  labels:
-    app: redis
-spec:
-  type: ClusterIP
-  ports:
-    - name: redis
-      port: 6379
-      targetPort: 6379
-  selector:
-    app: redis
 ---
 apiVersion: v1
 kind: Service
