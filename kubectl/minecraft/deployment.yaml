@@ -58,7 +58,7 @@ kind: Service
 metadata:
   name: minecraft-service
   annotations:
-    metallb.io/address-pool: metallbaddresspool
+    metallb.io/address-pool: internal-pool
     metallb.io/allow-shared-ip: "shared-ip"
 spec:
   type: LoadBalancer
