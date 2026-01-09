@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+metadata:
+  name: crowdsec
+  namespace: default
+kind: Deployment
+spec:
+  selector:
+    matchLabels:
+      tag: crowdsec
+  template:
+    metadata:
+      labels:
+        tag: crowdsec
+    spec:
+      containers:         
+        - name: crowdsec
+          image: docker.io/crowdsecurity/crowdsec:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 7422
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /etc/crowdsec
+              name: nfs
+              subPath: applications/crowdsec/volumes/
+            - mountPath: /var/lib/crowdsec/data
+              name: nfs
+              subPath: applications/crowdsec/volumes/data
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "10m"
+            limits:
+              memory: "1024Mi"
+              cpu: "500m"                    
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+      restartPolicy: Always
+      # dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crowdsec-service
+  namespace: default  
+  annotations:
+    metallb.io/address-pool: internal-pool
+    metallb.io/allow-shared-ip: "shared-ip"
+spec:
+  ports:
+    - port: 8087
+      targetPort: 8080
+      name: http-openappsec
+    - port: 7422
+      targetPort: 7422
+      name: openappsec-api      
+  selector:
+    tag: crowdsec
+  type: LoadBalancer
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+    name: crowdsec-bouncer-traefik-plugin
+    namespace: kube-system
+spec:
+    plugin:
+        crowdsec-bouncer-traefik-plugin:
+          CrowdsecLapiKey: qmrcAygNqILaShCpOHEMS3406GP/u0UT3in/gubCA+s
+          Enabled: true
+          CrowdsecLapiHost: crowdsec-service.default.svc.cluster.local:8087
+          crowdsecMode: stream

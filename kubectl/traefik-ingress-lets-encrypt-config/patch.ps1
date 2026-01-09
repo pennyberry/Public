@@ -28,4 +28,8 @@ $patch = @"
   }
 }
 "@
+
+
+#kubectl get deployment traefik -o jsonpath='{.spec.template.spec.volumes}'
 kubectl patch deployment traefik -n kube-system --type='strategic' -p $patch
+kubectl patch deployment traefik --type=json -p='[{"op":"remove","path":"/spec/template/spec/volumes/1"}]'
