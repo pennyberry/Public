@@ -237,4 +237,62 @@ spec:
           service:
             name: opnsense
             port:
-              number: 10443              
+              number: 10443
+##
+# Hytale Ingress Configuration
+##
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hytale
+  annotations:
+    metallb.io/address-pool: internal-pool
+    metallb.io/allow-shared-ip: "shared-ip"   
+spec:
+  type: LoadBalancer
+  ports:
+    - name: server
+      port: 5520
+      protocol: UDP
+      targetPort: 5520
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: hytale
+  labels:
+    kubernetes.io/service-name: hytale
+addressType: IPv4
+ports:
+  - name: server
+    protocol: UDP
+    port: 5520
+endpoints:
+  - addresses:
+      - "192.168.1.217"
+    conditions:
+      serving: true
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hytale-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+spec:
+  tls:
+    - hosts:
+      - hytale.joeberry.org
+  rules:
+  - host: hytale.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hytale
+            port:
+              number: 5520
