@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hytale
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hytale
+  template:
+    metadata:
+      labels:
+        app: hytale
+    spec:
+      containers:
+        - name: hytale
+          securityContext:
+            runAsUser: 0
+          env:
+            - name: JAVA_OPTS
+              value: "-Xms6G -Xmx12G -XX:+UseG1GC -XX:AOTCache=/server/Server/HytaleServer.aot"
+          image:  rxmarin/hytale-docker
+          resources:
+            requests:
+              memory: "6Gi"
+              cpu: "10m"
+            limits:
+              memory: "12Gi"
+              cpu: "1000m"  
+          volumeMounts:
+            - mountPath: /server
+              name: nfs
+              subPath: applications/hytale/volumes/hytale-docker
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15          
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hytale-service-udp
+  annotations:
+    metallb.io/address-pool: "internal-pool"
+    metallb.io/allow-shared-ip: "shared-ip"
+spec:
+  type: LoadBalancer
+  selector:
+    app: hytale
+  ports:
+    - name: http
+      port: 5520
+      targetPort: 5520
+      protocol: UDP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hytale-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+spec:
+  tls:
+    - hosts:
+      - hytale.joeberry.org
+  rules:
+  - host: hytale.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hytale-service-udp
+            port:
+              number: 5520
