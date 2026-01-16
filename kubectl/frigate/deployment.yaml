@@ -44,6 +44,15 @@ spec:
           operator: "Exists"    
           effect: "NoExecute"    
           tolerationSeconds: 15          
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - k3s-1
       volumes:
         - name: nfs
           persistentVolumeClaim:
