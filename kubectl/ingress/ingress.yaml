@@ -29,7 +29,7 @@ ports:
     port: 8096
 endpoints:
   - addresses:
-      - "192.168.1.27"
+      - "192.168.1.218"
     conditions:
       serving: true
 ---

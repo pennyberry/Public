@@ -15,10 +15,11 @@ provider "proxmox" {
     # run configure-pve-access.sh on your Proxmox server to create a user for terraform
     # e.g. "terraform@pve!provider=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
     insecure = true
+    username = "root@pam"
     ssh {
         agent    = true
         username = "root"
-        password = var.SSH_PASSWORD
+        private_key = sensitive(file("~/.ssh/id_rsa"))
     }
 }
 
