@@ -17,17 +17,3 @@ $modulesDir = Join-Path $scriptDir "modules"
 & $modulesDir\unmount-wim.ps1
 & $modulesDir\create-iso.ps1
 & $modulesDir\unmount-image.ps1
-
-
-
-# # Run each module file
-# foreach ($file in $moduleFiles) {
-#     Write-Host "Running: $($file.Name)" -ForegroundColor Green
-#     try {
-#         & $file.FullName
-#     } catch {
-#         Write-Error "Error running $($file.Name): $_"
-#     }
-# }
-
-# Write-Host "All modules completed." -ForegroundColor Green
