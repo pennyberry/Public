@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+
+<label for="avatar">Choose a new picture:</label>
+<form action="upload.php" method="POST" enctype="multipart/form-data">
+    <input type="file" id="avatar" name="avatar" accept="image/jpg, image/jpeg" required onchange="this.form.submit()">
+</form>
+
+<br>
+<img src="picture.jpg" alt="Current Picture" cache-control="no-cache">
+<style>
+    img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+</style>
+</body>
+</html>
