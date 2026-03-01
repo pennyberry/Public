@@ -93,7 +93,7 @@ spec:
     app: gluetun
   ports:
     - name: manage-http
-      port: 8080
+      port: 8079
       targetPort: 8080
 ---
 apiVersion: networking.k8s.io/v1
@@ -118,4 +118,4 @@ spec:
           service:
             name: gluetun
             port:
-              number: 8080          
+              number: 8079
