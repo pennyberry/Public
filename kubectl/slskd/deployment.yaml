@@ -36,6 +36,12 @@ spec:
                     - mountPath: /app/
                       name: nfs
                       subPath: applications/slskd/volumes/config/
+                  livenessProbe:
+                    exec:
+                      command: ["/bin/sh", "-c", "wget -qO- http://127.0.0.1:9999 || exit 1"]
+                    initialDelaySeconds: 60
+                    periodSeconds: 60
+                    timeoutSeconds: 5
                 - name: curlpodtest
                   image: alpine/curl
                   ports:

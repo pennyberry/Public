@@ -30,3 +30,14 @@ spec:
     services:
     - name: api@internal
       kind: TraefikService
+---
+# Redirect to https
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirectscheme
+  namespace: kube-system
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
