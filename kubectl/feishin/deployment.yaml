@@ -1,34 +1,38 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: grafana
+  name: feishin
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: grafana
+      app: feishin
   template:
     metadata:
       labels:
-        app: grafana
+        app: feishin
     spec:
       containers:
-        - name: grafana
-          image: grafana/grafana-enterprise
-          envFrom:
-            - secretRef:
-                name: grafana-secrets
+        - name: feishin
+          image: ghcr.io/jeffvli/feishin:latest
+          env:
+            - name: SERVER_NAME
+              value: "Jellyfin"
+            - name: SERVER_LOCK
+              value: "true"
+            - name: SERVER_TYPE
+              value: "jellyfin"
+            - name: LEGACY_AUTHENTICATION
+              value: "false"
+            - name: SERVER_URL
+              value: "https://jellyfin.joeberry.org"
           resources:
             requests:
               memory: "256Mi"
               cpu: "10m"
             limits:
-              memory: "512Mi"
+              memory: "1Gi"
               cpu: "1000m"
-          volumeMounts:
-            - mountPath: /var/lib/grafana
-              name: nfs
-              subPath: applications/grafana/volumes/grafana
       tolerations:
         - key: "node.kubernetes.io/unreachable"
           operator: "Exists"
@@ -37,48 +41,44 @@ spec:
         - key: "node.kubernetes.io/not-ready"
           operator: "Exists"    
           effect: "NoExecute"    
-          tolerationSeconds: 15          
-      volumes:
-        - name: nfs
-          persistentVolumeClaim:
-            claimName: truenas-pvc
+          tolerationSeconds: 15
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: grafana-service-tcp
+  name: feishin-service
   annotations:
     metallb.io/address-pool: internal-pool
     metallb.io/allow-shared-ip: "shared-ip"
 spec:
   type: LoadBalancer
   selector:
-    app: grafana
+    app: feishin
   ports:
     - name: http
-      port: 3000
-      targetPort: 3000
+      port: 9180
+      targetPort: 9180
       protocol: TCP
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: grafana-ingress
+  name: feishin-ingress
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
 spec:
   tls:
     - hosts:
-      - grafana.joeberry.org
+      - music.joeberry.org
   rules:
-  - host: grafana.joeberry.org
+  - host: music.joeberry.org
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: authentik-server
+            name: feishin-service
             port:
-              number: 9000      
+              number: 9180         

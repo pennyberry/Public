@@ -1,0 +1,31 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - deployment.yaml
+
+secretGenerator:
+  - name: gluetun2-secrets
+    envs:
+      - env-vars.env
+    literals:
+      - VPN_SERVICE_PROVIDER=protonvpn
+      - VPN_TYPE=wireguard
+      - SERVER_COUNTRIES=United States
+      - PORT_FORWARD_ONLY=on
+      - VPN_PORT_FORWARDING_PROVIDER=protonvpn
+      - VPN_PORT_FORWARDING_UP_COMMAND= '/bin/sh -c "sed -i 's/listen_port:.*/listen_port\:{{PORTS}}/' /app/slskd.yml"'
+      - VPN_PORT_FORWARDING=on
+      - GLUETUN_HTTP_CONTROL_SERVER_ENABLE=on
+      - DOT=off
+      - PUID=0
+      - PGID=0
+      - HTTPPROXY=off
+      - SHADOWSOCKS=off
+      - SLSKD_REMOTE_CONFIGURATION=true
+      # - SLSKD_VPN_PORT_FORWARDING=true
+      # - SLSKD_VPN_GLUETUN_URL=http://localhost:8000
+      # - SLSKD_VPN=true
+
+generatorOptions:
+  disableNameSuffixHash: true

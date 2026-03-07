@@ -311,7 +311,7 @@ spec:
   type: LoadBalancer
   ports:
     - name: http
-      port: 9000
+      port: 5000
       targetPort: 9000
 ---
 apiVersion: discovery.k8s.io/v1
@@ -324,10 +324,10 @@ addressType: IPv4
 ports:
   - name: http
     protocol: TCP
-    port: 9000
+    port: 5000
 endpoints:
   - addresses:
-      - "192.168.1.250"
+      - "192.168.1.206"
     conditions:
       serving: true
 ---
@@ -350,6 +350,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: frigate
+            name: authentik-server
             port:
               number: 9000

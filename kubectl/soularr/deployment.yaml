@@ -1,34 +1,34 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: grafana
+  name: soularr
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: grafana
+      app: soularr
   template:
     metadata:
       labels:
-        app: grafana
+        app: soularr
     spec:
       containers:
-        - name: grafana
-          image: grafana/grafana-enterprise
-          envFrom:
-            - secretRef:
-                name: grafana-secrets
+        - name: soularr
+          image: mrusse08/soularr:latest            
           resources:
             requests:
-              memory: "256Mi"
+              memory: "128Mi"
               cpu: "10m"
             limits:
               memory: "512Mi"
-              cpu: "1000m"
+              cpu: "1000m"  
           volumeMounts:
-            - mountPath: /var/lib/grafana
+            - mountPath: /data
               name: nfs
-              subPath: applications/grafana/volumes/grafana
+              subPath: applications/soularr/volumes/data
+            - mountPath: /downloads
+              name: nfs
+              subPath: applications/qbittorrent-nox/volumes/downloads/music
       tolerations:
         - key: "node.kubernetes.io/unreachable"
           operator: "Exists"
@@ -46,33 +46,33 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: grafana-service-tcp
+  name: soularr-service
   annotations:
     metallb.io/address-pool: internal-pool
     metallb.io/allow-shared-ip: "shared-ip"
 spec:
   type: LoadBalancer
   selector:
-    app: grafana
+    app: soularr
   ports:
     - name: http
-      port: 3000
-      targetPort: 3000
+      port: 5025
+      targetPort: 8080
       protocol: TCP
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: grafana-ingress
+  name: soularr-ingress
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
 spec:
   tls:
     - hosts:
-      - grafana.joeberry.org
+      - soularr.joeberry.org
   rules:
-  - host: grafana.joeberry.org
+  - host: soularr.joeberry.org
     http:
       paths:
       - path: /
@@ -81,4 +81,4 @@ spec:
           service:
             name: authentik-server
             port:
-              number: 9000      
+              number: 9000
