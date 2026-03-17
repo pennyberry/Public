@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: longhorn-static
+  volumeName: test
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: test
+  namespace: default
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: longhorn-static
+  claimRef:
+    namespace: default
+    name: test
+  csi:
+    driver: driver.longhorn.io
+    volumeHandle: test
+    fsType: ext4
