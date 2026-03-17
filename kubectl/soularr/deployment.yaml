@@ -21,7 +21,10 @@ spec:
               cpu: "10m"
             limits:
               memory: "512Mi"
-              cpu: "1000m"  
+              cpu: "1000m"
+          env:
+            - name: SCRIPT_INTERVAL
+              value: "200"
           volumeMounts:
             - mountPath: /data
               name: nfs
