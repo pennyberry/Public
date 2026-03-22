@@ -67,6 +67,7 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd, kube-system-security-headers@kubernetescrd
 spec:
   tls:
     - hosts:

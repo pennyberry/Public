@@ -45,12 +45,29 @@ spec:
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: hsts
+  name: security-headers
   namespace: kube-system
 spec:
   headers:
     frameDeny: true
     sslRedirect: true
+    # https://github.com/Haxxnet/Compose-Examples/blob/main/examples/traefik/fileConfig.yml
+    customResponseHeaders:
+      Server: "" # prevent version disclosure
+      X-Powered-By: "" # prevent version disclosure
+      X-Forwarded-Proto: "https"
+    sslProxyHeaders:
+      X-Forwarded-Proto: "https"
+    hostsProxyHeaders:
+      - "X-Forwarded-Host"
+    contentTypeNosniff: true
+    customFrameOptionsValue: "SAMEORIGIN"
+    browserXssFilter: false # X-XSS-Protection; deprecated
+    referrerPolicy: "strict-origin-when-cross-origin" # Referrer-Policy
+    forceSTSHeader: true # HTTP-Strict-Transport-Security (HSTS)
+    stsIncludeSubdomains: true # HTTP-Strict-Transport-Security (HSTS)
+    stsSeconds: 63072000 # HTTP-Strict-Transport-Security (HSTS)
+    stsPreload: true # HTTP-Strict-Transport-Security (HSTS)    
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware

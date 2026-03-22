@@ -40,6 +40,7 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-security-headers@kubernetescrd
 spec:
   tls:
     - hosts:
@@ -87,7 +88,7 @@ metadata:
     metallb.io/address-pool: internal-pool
     metallb.io/allow-shared-ip: "shared-ip"
     traefik.ingress.kubernetes.io/service.serversscheme: https
-    traefik.ingress.kubernetes.io/service.serverstransport: kube-system-skipverify@kubernetescrd    
+    traefik.ingress.kubernetes.io/service.serverstransport: kube-system-skipverify@kubernetescrd
 spec:
   type: LoadBalancer
   ports:
@@ -118,7 +119,7 @@ metadata:
   name: proxmox-ingress
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd, kube-system-security-headers@kubernetescrd
     traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
 spec:
   tls:
@@ -199,7 +200,7 @@ metadata:
   name: truenas-ingress
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd, kube-system-security-headers@kubernetescrd
     traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
 spec:
   tls:
@@ -279,7 +280,7 @@ metadata:
   name: opnsense-ingress
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd, kube-system-security-headers@kubernetescrd
     traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
 spec:
   tls:
@@ -359,6 +360,7 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-security-headers@kubernetescrd
 spec:
   tls:
     - hosts:
@@ -436,6 +438,7 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-security-headers@kubernetescrd
 spec:
   tls:
     - hosts:
