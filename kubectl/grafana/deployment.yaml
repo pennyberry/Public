@@ -46,7 +46,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: grafana-service-tcp
+  name: grafana-service
   annotations:
     metallb.io/address-pool: internal-pool
     metallb.io/allow-shared-ip: "shared-ip"
@@ -79,9 +79,9 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: authentik-server
+            name: grafana-service
             port:
-              number: 9000
+              number: 3000
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -99,6 +99,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: authentik-server
+            name: grafana-service
             port:
-              number: 9000              
+              number: 3000              
