@@ -83,3 +83,23 @@ spec:
             name: nginx-picture-service-tcp
             port:
               number: 8084         
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: picture-ingress-http
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-redirect-to-https@kubernetescrd
+spec:
+  rules:
+  - host: picture.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-picture-service-tcp
+            port:
+              number: 8084                   

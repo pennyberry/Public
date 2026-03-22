@@ -62,26 +62,3 @@ spec:
       port: 5025
       targetPort: 8080
       protocol: TCP
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: soularr-ingress
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
-spec:
-  tls:
-    - hosts:
-      - soularr.joeberry.org
-  rules:
-  - host: soularr.joeberry.org
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: authentik-server
-            port:
-              number: 9000

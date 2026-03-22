@@ -216,5 +216,31 @@ spec:
               number: 9000
         path: /
         pathType: Prefix
-            
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: authentik-ingress-http
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-redirect-to-https@kubernetescrd
+spec:
+  rules:
+  - host: authentik.joeberry.org
+    http:
+      paths:
+      - backend:
+          service:
+            name: authentik-server            
+            port:
+              number: 9443
+        path: /
+        pathType: Prefix
+      - backend:
+          service:
+            name: authentik-server            
+            port:
+              number: 9000
+        path: /
+        pathType: Prefix            
        

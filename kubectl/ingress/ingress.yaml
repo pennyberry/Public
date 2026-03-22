@@ -55,6 +55,26 @@ spec:
             name: jellyfin
             port:
               number: 8096
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jellyfin-ingress-http
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-redirect-to-https@kubernetescrd
+spec:
+  rules:
+  - host: jellyfin.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: jellyfin
+            port:
+              number: 8096              
 ##
 # Proxmox Ingress Configuration
 ##
@@ -91,7 +111,6 @@ endpoints:
       - "192.168.1.79"
     conditions:
       serving: true
-    
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -116,6 +135,27 @@ spec:
             name: proxmox
             port:
               number: 8006
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: proxmox-ingress-http
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd, kube-system-redirect-to-https@kubernetescrd
+spec:
+  rules:
+  - host: proxmox.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: proxmox
+            port:
+              number: 8006
+
 ##
 # Truenas Ingress Configuration
 ##
@@ -152,7 +192,6 @@ endpoints:
       - "192.168.1.213"
     conditions:
       serving: true
-    
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -177,6 +216,26 @@ spec:
             name: truenas
             port:
               number: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: truenas-ingress-http
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd, kube-system-redirect-to-https@kubernetescrd
+spec:
+  rules:
+  - host: truenas.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: truenas
+            port:
+              number: 443              
 ##
 # OPNSense Ingress Configuration
 ##
@@ -213,7 +272,6 @@ endpoints:
       - "192.168.1.1"
     conditions:
       serving: true
-    
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -238,6 +296,26 @@ spec:
             name: opnsense
             port:
               number: 10443
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: opnsense-ingress-http
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd, kube-system-redirect-to-https@kubernetescrd
+spec:
+  rules:
+  - host: opnsense.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: opnsense
+            port:
+              number: 10443              
 ##
 # Hytale Ingress Configuration
 ##
@@ -296,8 +374,28 @@ spec:
             name: hytale
             port:
               number: 5520
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hytale-ingress-http
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-redirect-to-https@kubernetescrd
+spec:
+  rules:
+  - host: hytale.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hytale
+            port:
+              number: 5520              
 ##
-# Jellyfin Ingress Configuration
+# Frigate Ingress Configuration
 ##
 ---
 apiVersion: v1
@@ -342,6 +440,26 @@ spec:
   tls:
     - hosts:
       - frigate.joeberry.org
+  rules:
+  - host: frigate.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: authentik-server
+            port:
+              number: 9000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: frigate-ingress-http
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-redirect-to-https@kubernetescrd
+spec:
   rules:
   - host: frigate.joeberry.org
     http:

@@ -82,3 +82,23 @@ spec:
             name: feishin-service
             port:
               number: 9180         
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: feishin-ingress-http
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-redirect-to-https@kubernetescrd
+spec:
+  rules:
+  - host: music.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: feishin-service
+            port:
+              number: 9180

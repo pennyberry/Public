@@ -209,3 +209,23 @@ spec:
             name: omada-svc-tcp
             port:
               number: 8043
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: omada-ingress-http
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd,kube-system-redirect-to-https@kubernetescrd
+spec:
+  rules:
+  - host: omada.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: omada-svc-tcp
+            port:
+              number: 8043              

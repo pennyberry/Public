@@ -129,3 +129,23 @@ spec:
             name: gluetun2
             port:
               number: 5030
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: slskd-ingress-http
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd, kube-system-redirect-to-https@kubernetescrd
+spec:
+  rules:
+  - host: slskd.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: gluetun2
+            port:
+              number: 5030              
