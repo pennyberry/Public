@@ -15,7 +15,6 @@ secretGenerator:
       - PORT_FORWARD_ONLY=on
       - VPN_PORT_FORWARDING_PROVIDER=protonvpn
       - VPN_PORT_FORWARDING=on
-      - DOT=off
       - PUID=0
       - PGID=0
       - WEBUI_PORT=8080

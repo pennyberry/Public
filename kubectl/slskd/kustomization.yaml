@@ -23,9 +23,9 @@ secretGenerator:
       - HTTPPROXY=off
       - SHADOWSOCKS=off
       - SLSKD_REMOTE_CONFIGURATION=true
-      # - SLSKD_VPN_PORT_FORWARDING=true
-      # - SLSKD_VPN_GLUETUN_URL=http://localhost:8000
-      # - SLSKD_VPN=true
+      - SLSKD_VPN_PORT_FORWARDING=true
+      - SLSKD_VPN_GLUETUN_URL=http://localhost:8000
+      - SLSKD_VPN=true
 
 generatorOptions:
   disableNameSuffixHash: true

@@ -19,7 +19,7 @@ spec:
             initContainers:
                 - name: gluetun
                   restartPolicy: Always
-                  image: qmcgaw/gluetun
+                  image: qmcgaw/gluetun:v3
                   imagePullPolicy: Always
                   lifecycle:
                     postStart:
