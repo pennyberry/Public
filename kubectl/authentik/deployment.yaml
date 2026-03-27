@@ -83,7 +83,8 @@ spec:
                     --format=p \
                     -f ${BACKUP_FILE}
 
-                  find "${BACKUP_DIR}" -type f -name 'authentik_*.dump' -mtime +14 -delete
+                  # Keep only 15 minutes of dumps on disk; ZFS snapshots handle longer retention.
+                  find "${BACKUP_DIR}" -type f -name 'authentik_*.dump' -mmin +15 -print -delete
               volumeMounts:
                 - name: nfs
                   mountPath: /backups
