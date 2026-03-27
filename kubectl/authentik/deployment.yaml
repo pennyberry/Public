@@ -25,18 +25,73 @@ spec:
           volumeMounts:
             - name: nfs
               mountPath: /var/lib/postgresql/data
-              subPath: applications/authentik-4/volumes/pgdatabase             
+              subPath: applications/authentik/volumes/pgdatabase             
           resources:
             requests:
               memory: "256Mi"
               cpu: "100m"
             limits:
-              memory: "512Gi"
+              memory: "1024Mi"
               cpu: "900m"
+          # command: ["sleep", "infinity"]
       volumes:
         - name: nfs
           persistentVolumeClaim:
             claimName: truenas-pvc
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: authentik-postgresql-pgdump
+  labels:
+    app: authentik-postgresql-pgdump
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: authentik-postgresql-pgdump
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: pgdump
+              image: docker.io/library/postgres:17.7-bookworm
+              envFrom:
+                - secretRef:
+                    name: authentik-secrets
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -eu
+                  umask 077
+                  BACKUP_DIR="/backups"
+                  TIMESTAMP="$(date +%Y-%m-%d_%H-%M-%S)"
+                  BACKUP_FILE="${BACKUP_DIR}/authentik_${TIMESTAMP}.dump"
+                  export PGPASSWORD="${AUTHENTIK_POSTGRESQL__PASSWORD:-${POSTGRES_PASSWORD}}"
+
+                  mkdir -p "${BACKUP_DIR}"
+                  pg_dump \
+                    --host=${AUTHENTIK_POSTGRESQL__HOST} \
+                    --port=${AUTHENTIK_POSTGRESQL__PORT} \
+                    -U ${AUTHENTIK_POSTGRESQL__USER} \
+                    --format=p \
+                    -f ${BACKUP_FILE}
+
+                  find "${BACKUP_DIR}" -type f -name 'authentik_*.dump' -mtime +14 -delete
+              volumeMounts:
+                - name: nfs
+                  mountPath: /backups
+                  subPath: applications/postgresql-backups/pgdump
+          volumes:
+            - name: nfs
+              persistentVolumeClaim:
+                claimName: truenas-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
