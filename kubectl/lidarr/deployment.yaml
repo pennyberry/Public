@@ -46,7 +46,7 @@ spec:
             claimName: truenas-pvc
         - name: longhorn-static
           persistentVolumeClaim:
-            claimName: test          
+            claimName: longhorn-pvc          
 ---
 apiVersion: v1
 kind: Service
