@@ -1,0 +1,166 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: romm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: romm
+  template:
+    metadata:
+      labels:
+        app: romm
+    spec:
+      containers:
+        - name: romm
+          image: rommapp/romm            
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "10m"
+            limits:
+              memory: "512Mi"
+              cpu: "1000m" 
+          envFrom:
+            - secretRef:
+                name: romm-secrets
+          volumeMounts:
+            - mountPath: /romm/library
+              name: nfs
+              subPath: applications/qbittorrent-nox/volumes/downloads/games          
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15          
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: romm-mariadb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: romm-mariadb
+  template:
+    metadata:
+      labels:
+        app: romm-mariadb
+    spec:
+      containers:
+        - name: romm-mariadb
+          image: mariadb:latest            
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "10m"
+            limits:
+              memory: "512Mi"
+              cpu: "1000m" 
+          envFrom:
+            - secretRef:
+                name: romm-secrets
+          # volumeMounts:
+          #   - mountPath: /config
+          #     name: nfs
+          #     subPath: applications/romm/volumes/config
+          #   - mountPath: /data
+          #     name: nfs
+          #     subPath: applications/qbittorrent-nox/volumes              
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15          
+      # volumes:
+      #   - name: nfs
+      #     persistentVolumeClaim:
+      #       claimName: truenas-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: romm-mariadb-service
+spec:
+  selector:
+    app: romm-mariadb
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: 3306
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: romm-service
+  annotations:
+    metallb.io/address-pool: internal-pool
+    metallb.io/allow-shared-ip: "shared-ip"
+spec:
+  type: LoadBalancer
+  selector:
+    app: romm
+  ports:
+    - name: http
+      port: 8885
+      targetPort: 8080
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: romm-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-security-headers@kubernetescrd
+spec:
+  tls:
+    - hosts:
+      - romm.joeberry.org
+  rules:
+  - host: romm.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: romm-service
+            port:
+              number: 8885         
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: romm-ingress-http
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-redirect-to-https@kubernetescrd
+spec:
+  rules:
+  - host: romm.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: authentik-server
+            port:
+              number: 9000                       

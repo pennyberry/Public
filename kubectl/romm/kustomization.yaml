@@ -1,0 +1,29 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - deployment.yaml
+
+secretGenerator:
+  - name: romm-secrets
+    envs:
+      - env-vars.env
+    literals:
+      - MARIADB_DATABASE=romm_db
+      - MARIADB_USER=romm_user
+      - DB_NAME=romm_db
+      - DB_USER=romm_user
+      - DB_HOST=romm-mariadb-service.default.svc.cluster.local
+      - DISABLE_USERPASS_LOGIN=false
+      - SCAN_WORKERS=2
+      - OIDC_ENABLED=true
+      - OIDC_PROVIDER=Authentik
+      - OIDC_REDIRECT_URI=https://romm.joeberry.org/api/oauth/openid
+      - OIDC_SERVER_APPLICATION_URL=https://authentik.joeberry.org/application/o/romm/
+      - ENABLE_SCHEDULED_RESCAN=true
+
+# in authentik, you have to set cutomize>property mappings>authentik default OAuth Mapping: OpenID 'email'>"email_verified": True
+# https://version-2025-10.goauthentik.io/add-secure-apps/providers/oauth2/#email-scope-verification
+
+generatorOptions:
+  disableNameSuffixHash: true
