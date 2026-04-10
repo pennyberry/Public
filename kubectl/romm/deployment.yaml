@@ -70,13 +70,10 @@ spec:
           envFrom:
             - secretRef:
                 name: romm-secrets
-          # volumeMounts:
-          #   - mountPath: /config
-          #     name: nfs
-          #     subPath: applications/romm/volumes/config
-          #   - mountPath: /data
-          #     name: nfs
-          #     subPath: applications/qbittorrent-nox/volumes              
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: longhorn-static-romm
+              subPath: applications/romm/volumes/data
       tolerations:
         - key: "node.kubernetes.io/unreachable"
           operator: "Exists"
@@ -86,10 +83,10 @@ spec:
           operator: "Exists"    
           effect: "NoExecute"    
           tolerationSeconds: 15          
-      # volumes:
-      #   - name: nfs
-      #     persistentVolumeClaim:
-      #       claimName: truenas-pvc
+      volumes:
+        - name: longhorn-static-romm
+          persistentVolumeClaim:
+            claimName: longhorn-pvc-romm      
 ---
 apiVersion: v1
 kind: Service

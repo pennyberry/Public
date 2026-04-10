@@ -14,13 +14,15 @@ secretGenerator:
       - DB_NAME=romm_db
       - DB_USER=romm_user
       - DB_HOST=romm-mariadb-service.default.svc.cluster.local
-      - DISABLE_USERPASS_LOGIN=false
-      - SCAN_WORKERS=2
+      - DISABLE_USERPASS_LOGIN=true
+      - SCAN_WORKERS=3
       - OIDC_ENABLED=true
       - OIDC_PROVIDER=Authentik
       - OIDC_REDIRECT_URI=https://romm.joeberry.org/api/oauth/openid
       - OIDC_SERVER_APPLICATION_URL=https://authentik.joeberry.org/application/o/romm/
       - ENABLE_SCHEDULED_RESCAN=true
+      - SCHEDULED_RESCAN_CRON="0 */4 * * *"
+
 
 # in authentik, you have to set cutomize>property mappings>authentik default OAuth Mapping: OpenID 'email'>"email_verified": True
 # https://version-2025-10.goauthentik.io/add-secure-apps/providers/oauth2/#email-scope-verification
