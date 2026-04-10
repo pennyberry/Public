@@ -112,7 +112,7 @@ spec:
     spec:
       containers:
         - name: authentik-server
-          image: ghcr.io/goauthentik/server:2025.10.3
+          image: ghcr.io/goauthentik/server:2026.2
           args:
             - server
           envFrom:
@@ -120,11 +120,11 @@ spec:
                 name: authentik-secrets
           volumeMounts:
             - name: nfs
-              mountPath: /media
-              subPath: applications/authentik-4/volumes/media
+              mountPath: /data/media
+              subPath: applications/authentik/volumes/branding
             - name: nfs
               mountPath: /templates
-              subPath: applications/authentik-4/volumes/custom-templates
+              subPath: applications/authentik/volumes/custom-templates
           ports:
             - name: http
               containerPort: 9000
@@ -165,7 +165,7 @@ spec:
     spec:
       containers:
         - name: authentik-worker
-          image: ghcr.io/goauthentik/server:2025.10.3
+          image: ghcr.io/goauthentik/server:2026.2
           args:
             - worker
           env:
@@ -185,14 +185,14 @@ spec:
               protocol: TCP
           volumeMounts:
             - name: nfs
-              mountPath: /media
-              subPath: applications/authentik-4/volumes/media
+              mountPath: /data/media
+              subPath: applications/authentik/volumes/branding
             - name: nfs
               mountPath: /certs
-              subPath: applications/authentik-4/volumes/certs
+              subPath: applications/authentik/volumes/certs
             - name: nfs
               mountPath: /templates
-              subPath: applications/authentik-4/volumes/custom-templates
+              subPath: applications/authentik/volumes/custom-templates
           resources:
             requests:
               memory: "720Mi"
