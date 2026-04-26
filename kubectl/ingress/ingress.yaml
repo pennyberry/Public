@@ -490,7 +490,7 @@ spec:
   ports:
     - name: http
       port: 8123
-      targetPort: 9000
+      targetPort: 8123
 ---
 apiVersion: discovery.k8s.io/v1
 kind: EndpointSlice
@@ -529,9 +529,9 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: authentik-server
+            name: homeassistant
             port:
-              number: 9000
+              number: 8123
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -549,6 +549,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: authentik-server
+            name: homeassistant
             port:
-              number: 9000              
+              number: 8123              
