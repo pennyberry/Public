@@ -474,3 +474,81 @@ spec:
             name: authentik-server
             port:
               number: 9000
+##
+# Home Assistant Ingress Configuration
+##
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: homeassistant
+  annotations:
+    metallb.io/address-pool: internal-pool
+    metallb.io/allow-shared-ip: "shared-ip"
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 8123
+      targetPort: 9000
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: homeassistant
+  labels:
+    kubernetes.io/service-name: homeassistant
+addressType: IPv4
+ports:
+  - name: http
+    protocol: TCP
+    port: 8123
+endpoints:
+  - addresses:
+      - "192.168.1.172"
+    conditions:
+      serving: true
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: homeassistant-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-security-headers@kubernetescrd
+spec:
+  tls:
+    - hosts:
+      - homeassistant.joeberry.org
+  rules:
+  - host: homeassistant.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: authentik-server
+            port:
+              number: 9000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: homeassistant-ingress-http
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-redirect-to-https@kubernetescrd
+spec:
+  rules:
+  - host: homeassistant.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: authentik-server
+            port:
+              number: 9000              
