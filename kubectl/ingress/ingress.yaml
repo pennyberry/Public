@@ -516,7 +516,8 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
-    traefik.ingress.kubernetes.io/router.middlewares: kube-system-security-headers@kubernetescrd
+    # traefik.ingress.kubernetes.io/router.middlewares: kube-system-security-headers@kubernetescrd
+    # to-do - homeassistant and oidc don't like these security headers, need to figure out which ones and create a custom middleware for them
 spec:
   tls:
     - hosts:
