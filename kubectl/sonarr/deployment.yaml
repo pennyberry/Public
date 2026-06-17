@@ -24,8 +24,8 @@ spec:
               cpu: "1000m"  
           volumeMounts:
             - mountPath: /config
-              name: nfs
-              subPath: applications/sonarr/volumes/data
+              name: longhorn-sonarr
+              subPath: sonarr/config
             - mountPath: /data
               name: nfs
               subPath: applications/qbittorrent-nox/volumes              
@@ -42,6 +42,9 @@ spec:
         - name: nfs
           persistentVolumeClaim:
             claimName: truenas-pvc
+        - name: longhorn-sonarr
+          persistentVolumeClaim:
+            claimName: longhorn-pvc-sonarr             
 ---
 apiVersion: v1
 kind: Service
