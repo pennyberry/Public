@@ -66,8 +66,10 @@ spec:
                     exec:
                       command:
                         - "wget -q -O - http://localhost:8080/api/v2/transfer/info | grep '\"connection_status\":\"connected\"' || exit 1"
-                    periodSeconds: 90
+                    periodSeconds: 30
                     initialDelaySeconds: 30
+                    failureThreshold: 3
+
                   volumeMounts:
                     - mountPath: /config
                       name: nfs
