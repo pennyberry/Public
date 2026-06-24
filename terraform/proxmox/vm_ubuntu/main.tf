@@ -49,7 +49,7 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
     disk {
       datastore_id = var.datastore_id
       interface    = var.interface
-      import_from  = data.proxmox_virtual_environment_file.latest_ubuntu_24_noble_qcow2_img.id
+      import_from  = data.proxmox_file.latest_ubuntu_24_noble_qcow2_img.id
       size = var.disk_size_gb
     }
     network_device {
@@ -81,7 +81,7 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
     }
 }
 
-data "proxmox_virtual_environment_file" "latest_ubuntu_24_noble_qcow2_img" {
+data "proxmox_file" "latest_ubuntu_24_noble_qcow2_img" {
   node_name = var.proxmox_node_name
   datastore_id = "iso-storage"
   content_type = "import"
