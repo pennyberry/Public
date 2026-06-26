@@ -102,7 +102,7 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
   source_raw {
     data = <<-EOF
     #cloud-config
-    hostname: "${local.vm_names[count.index]}"
+    hostname: "${local.vm_names[count.index]}.${var.domain_dns_name}"
     timezone: America/New_York
     users:
       - default
@@ -114,6 +114,8 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
           - ${trimspace(data.local_sensitive_file.ssh_key.content)}
         sudo: ALL=(ALL) NOPASSWD:ALL
     package_update: true
+    package_upgrade: true
+    package_reboot_if_required: true
     packages:
       - qemu-guest-agent
       - net-tools

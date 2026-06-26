@@ -148,7 +148,6 @@ variable "disk_size_gb" {
   type = number
   default = 10
 }
-
 variable "domain_dns_name" {
   description = "Domain DNS name to append to the hostname."
   type = string
