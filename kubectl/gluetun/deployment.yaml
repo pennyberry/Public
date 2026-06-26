@@ -65,6 +65,8 @@ spec:
                   livenessProbe:
                     exec:
                       command:
+                        - "sh"
+                        - "-c"
                         - "wget -q -O - http://localhost:8080/api/v2/transfer/info | grep '\"connection_status\":\"connected\"' || exit 1"
                     periodSeconds: 30
                     initialDelaySeconds: 30
