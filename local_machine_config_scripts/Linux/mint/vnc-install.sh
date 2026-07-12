@@ -12,7 +12,7 @@ After=display-manager.service network.target syslog.target
 # the type of the service
 Type=simple
 # process config
-ExecStart=/usr/bin/x11vnc -forever -display :0 -auth guess -passwd $vnc_password
+ExecStart=/usr/bin/x11vnc -forever -display :0 -geometry 1920x1080 -auth guess -passwd $vnc_password
 # do this on process stop
 ExecStop=/usr/bin/killall x11vnc
 # restart when failed
@@ -27,3 +27,6 @@ sudo systemctl enable vnc.service
 sudo systemctl start vnc.service
 sudo systemctl status vnc.service
 sudo ufw allow 5900
+
+#logs
+# journalctl -u vnc.service | tail -50
