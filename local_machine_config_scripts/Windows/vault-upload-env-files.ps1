@@ -7,6 +7,9 @@ $repoRoot = Read-Host "Enter the repository path to upload env-vars.env files to
 $repoName = Split-Path $repoRoot -Leaf
 $vaultBase = "$repoName"
 
+# 
+$vaultAddress = Read-Host "Enter your vault address - https://your-vault-address.domain.tld"
+$env:VAULT_ADDR = $vaultAddress
 #login to vault
 $vaultToken = Read-Host "Enter your vault token - login to vault with oidc - top right click copy token..."
 vault login $vaultToken
