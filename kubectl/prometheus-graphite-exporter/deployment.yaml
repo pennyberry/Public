@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-graphite-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-graphite-exporter
+  template:
+    metadata:
+      labels:
+        app: prometheus-graphite-exporter
+    spec:
+      containers:
+        - name: prometheus-graphite-exporter
+          image: prom/graphite-exporter            
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "10m"
+            limits:
+              memory: "256Mi"
+              cpu: "1000m"  
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-graphite-exporter-service
+  annotations:
+    metallb.io/address-pool: internal-pool
+    metallb.io/allow-shared-ip: "shared-ip"
+spec:
+  type: LoadBalancer
+  selector:
+    app: prometheus-graphite-exporter
+  ports:
+    - name: truenas-port
+      port: 9109
+      targetPort: 9109
+      protocol: TCP
+    - name: prometheus-port
+      port: 9108
+      targetPort: 9108
+      protocol: TCP

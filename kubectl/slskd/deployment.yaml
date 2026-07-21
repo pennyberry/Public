@@ -79,6 +79,13 @@ spec:
                     - mountPath: /downloads
                       name: nfs
                       subPath: applications/qbittorrent-nox/volumes/downloads/music
+                  livenessProbe:
+                    httpGet:
+                      path: /health
+                      port: 5030
+                    initialDelaySeconds: 900
+                    periodSeconds: 30
+                    failureThreshold: 5
             volumes:
               - name: nfs
                 persistentVolumeClaim:
