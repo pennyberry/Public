@@ -7,7 +7,15 @@ variable "username" {}
 variable "proxmox_node_name" {
     description = "Proxmox node name where the VM will be created."
     type        = string
-    default     = "pve"
+    default     = "kiwi"
+    validation {
+        condition = contains([
+            "kiwi",
+            "pve2",
+            "pve3",
+        ], var.proxmox_node_name)
+        error_message = "proxmox_node_name must be one of the supported node names."
+    }
 }
 
 variable "agent_enabled" {
