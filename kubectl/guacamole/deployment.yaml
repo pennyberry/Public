@@ -1,3 +1,24 @@
+# NOTES #
+# You will need to take a few steps when configuring OIDC auth for guacamole
+# a guacamole.properties file will be created in the config\guacamole\ directory. edit it and add the following
+
+# extension-priority: *, openid
+# openid-client-id: YOURCLIENTID
+# openid-authorization-endpoint: https://YOUR-OIDC-SERVER.COM/application/o/authorize/
+# openid-jwks-endpoint: https://YOUR-OIDC-SERVER.COM/application/o/YOUR-SLUG/jwks/
+# openid-issuer: https://YOUR-OIDC-SERVER.COM/application/o/YOUR-SLUG/
+# openid-redirect-uri: https://YOUR-GUACAMOLE-SERVER.COM/
+# openid-username-claim-type: preferred_username
+# openid-scope: openid email profile
+# restart the application
+
+# once you are configured, you will want to pre-create your admin user.
+# create the user with no password and use the same username as your OIDC username. and set the local permissions as needed
+# then edit the guacamole.properties file and edit the following line and remove "*, " so that local auth is disabled:
+# extension-priority: openid
+
+# restart the application and you should be all set
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,7 +37,7 @@ spec:
         - name: guacamole
           env:
             - name: EXTENSIONS
-              value: "auth-header"
+              value: "auth-header,auth-sso-openid"
           image:  jwetzell/guacamole
           resources:
             requests:
@@ -80,9 +101,9 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: authentik-server
+            name: guacamole-service-tcp
             port:
-              number: 9000
+              number: 8086
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -100,6 +121,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: authentik-server
+            name: guacamole-service-tcp
             port:
-              number: 9000
+              number: 8086
