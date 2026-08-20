@@ -14,10 +14,10 @@ secretGenerator:
       - SERVER_COUNTRIES=United States
       - PORT_FORWARD_ONLY=on
       - VPN_PORT_FORWARDING_PROVIDER=protonvpn
-      - VPN_PORT_FORWARDING_UP_COMMAND= '/bin/sh -c "sed -i 's/listen_port:.*/listen_port\:{{PORTS}}/' /app/slskd.yml"'
+      #- VPN_PORT_FORWARDING_UP_COMMAND= '/bin/sh -c "sed -i 's/listen_port:.*/listen_port\:{{PORTS}}/' /app/slskd.yml"'
       - VPN_PORT_FORWARDING=on
       - GLUETUN_HTTP_CONTROL_SERVER_ENABLE=on
-      - DOT=off
+      - HEALTH_TARGET_ADDRESSES=192.168.1.1:10443
       - PUID=0
       - PGID=0
       - HTTPPROXY=off
