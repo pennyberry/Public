@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chaptarr
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chaptarr
+  template:
+    metadata:
+      labels:
+        app: chaptarr
+    spec:
+      containers:
+        - name: chaptarr
+          image: chaptarr/chaptarr:latest      
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "10m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"  
+          volumeMounts:
+            - mountPath: /config
+              name: longhorn
+              subPath: applications/chaptarr/config
+            - mountPath: /ebooks
+              name: nfs
+              subPath: applications/qbittorrent-nox/volumes/downloads/chaptarr/ebooks
+            - mountPath: /audiobooks
+              name: nfs
+              subPath: applications/qbittorrent-nox/volumes/downloads/chaptarr/audiobooks
+            - mountPath: /downloads
+              name: nfs
+              subPath: applications/qbittorrent-nox/volumes/downloads/chaptarr/downloads                        
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 15
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"    
+          effect: "NoExecute"    
+          tolerationSeconds: 15          
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: truenas-pvc
+        - name: longhorn
+          persistentVolumeClaim:
+            claimName: longhorn-pvc-chaptarr            
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chaptarr-service
+  annotations:
+    metallb.io/address-pool: internal-pool
+    metallb.io/allow-shared-ip: "shared-ip"
+spec:
+  type: LoadBalancer
+  selector:
+    app: chaptarr
+  ports:
+    - name: http
+      port: 8789
+      targetPort: 8789
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chaptarr-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-security-headers@kubernetescrd
+spec:
+  tls:
+    - hosts:
+      - chaptarr.joeberry.org
+  rules:
+  - host: chaptarr.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: chaptarr-service
+            port:
+              number: 8789
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chaptarr-ingress-http
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-redirect-to-https@kubernetescrd
+spec:
+  rules:
+  - host: chaptarr.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: chaptarr-service
+            port:
+              number: 8789

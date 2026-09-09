@@ -35,4 +35,17 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  storageClassName: longhorn  
+  storageClassName: longhorn
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: longhorn-pvc-chaptarr
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+  storageClassName: longhorn    
