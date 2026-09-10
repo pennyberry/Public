@@ -79,6 +79,22 @@ spec:
                     - mountPath: /downloads
                       name: nfs
                       subPath: applications/qbittorrent-nox/volumes/downloads
+                - name: mousehole
+                  image: tmmrtn/mousehole:latest
+                  resources:
+                    requests:
+                      memory: "256Mi"
+                      cpu: "10m"
+                    limits:
+                      memory: "512Mi"
+                      cpu: "1000m"
+                  envFrom:
+                    - secretRef:
+                        name: gluetun-secrets
+                  volumeMounts:
+                    - mountPath: /var/lib/mousehole
+                      name: nfs
+                      subPath: applications/mousehole/                      
             volumes:
               - name: nfs
                 persistentVolumeClaim:
