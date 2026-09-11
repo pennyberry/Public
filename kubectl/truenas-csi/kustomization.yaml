@@ -1,0 +1,29 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - deployment.yaml
+
+secretGenerator:
+  - name: truenas-secrets
+    envs:
+      - env-vars.env
+    literals:
+      # - TRUENAS_URL=wss://your.ip.address
+      # - CSI_ENDPOINT=unix:///csi/csi.sock
+      # - TRUENAS_INSECURE_SKIP_VERIFY=true
+      # - TRUENAS_DEFAULT_POOL=your_pool_name
+      # - TRUENAS_NFS_SERVER=your.ip.address
+      # - TRUENAS_ISCSI_PORTAL=your.ip.address:3260
+      # - TRUENAS_NVMEOF_PORTAL=your.ip.address:4420
+      - TRUENAS_ISCSI_IQN_BASE="iqn.2000-01.io.truenas"  # Optional: Custom IQN prefix (default: iqn.2000-01.io.truenas)
+      # - TRUENAS_API_KEY=ENTER_YOUR_API_KEY_HERE
+  # Optional: Prometheus metrics. Uncomment to serve /metrics on this address in
+  # the controller, then apply deploy/monitoring/. Disabled while absent.
+  # metricsAddr: ":8080"
+  # Optional: the same for the node plugin, which runs with hostNetwork, so the
+  # address it binds is a port on every node. See docs/metrics.md.
+  # nodeMetricsAddr: ":8080"
+
+generatorOptions:
+  disableNameSuffixHash: true
