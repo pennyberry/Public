@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: chaptarr
+  name: calibre
 spec:
   strategy:
     type: Recreate
   replicas: 1
   selector:
     matchLabels:
-      app: chaptarr
+      app: calibre
   template:
     metadata:
       labels:
-        app: chaptarr
+        app: calibre
     spec:
       containers:
-        - name: chaptarr
-          image: chaptarr/chaptarr:latest      
+        - name: calibre
+          image: crocodilestick/calibre-web-automated:latest      
           resources:
             requests:
               memory: "128Mi"
@@ -26,20 +26,16 @@ spec:
               cpu: "1000m"  
           volumeMounts:
             - mountPath: /config
-              name: truenas-volume-chaptarr
-              subPath: chaptarr/config
-            - mountPath: /ebooks
+              name: truenas-volume-calibre
+              subPath: calibre/config
+            - mountPath: /cwa-book-ingest
               name: nfs
-              subPath: applications/qbittorrent-nox/volumes/downloads/chaptarr/ebooks
-            - mountPath: /audiobooks
-              name: nfs
-              subPath: applications/qbittorrent-nox/volumes/downloads/chaptarr/audiobooks
-            - mountPath: /downloads
-              name: nfs
-              subPath: applications/qbittorrent-nox/volumes/downloads/chaptarr/downloads                        
-          securityContext:
-            runAsUser: 0
-            runAsGroup: 0
+              subPath: applications/qbittorrent-nox/volumes/downloads/calibre/ebooks                   
+          env:
+            - name: NETWORK_SHARE_MODE
+              value: "true"
+            - name: CWA_PORT_OVERRIDE
+              value: "8677"
       tolerations:
         - key: "node.kubernetes.io/unreachable"
           operator: "Exists"
@@ -53,18 +49,18 @@ spec:
         - name: nfs
           persistentVolumeClaim:
             claimName: truenas-pvc
-        - name: truenas-volume-chaptarr
+        - name: truenas-volume-calibre
           persistentVolumeClaim:
-            claimName: truenas-pvc-chaptarr
+            claimName: truenas-pvc-calibre
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: truenas-nfs-chaptarr
+  name: truenas-nfs-calibre
 provisioner: csi.truenas.io
 parameters:
   protocol: "nfs"
-  datasetPath: "k8s/chaptarr"
+  datasetPath: "k8s/calibre"
   compression: "LZ4"
   sync: "DISABLED"
   nfs.mountOptions: "hard,nfsvers=4.1"
@@ -75,36 +71,36 @@ allowVolumeExpansion: true
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: truenas-pvc-chaptarr
+  name: truenas-pvc-calibre
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: truenas-nfs-chaptarr
+  storageClassName: truenas-nfs-calibre
   resources:
     requests:
-      storage: 10Gi
+      storage: 1Gi
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: chaptarr-service
+  name: calibre-service
   annotations:
     metallb.io/address-pool: internal-pool
     metallb.io/allow-shared-ip: "shared-ip"
 spec:
   type: LoadBalancer
   selector:
-    app: chaptarr
+    app: calibre
   ports:
     - name: http
-      port: 8789
-      targetPort: 8789
+      port: 8677
+      targetPort: 8677
       protocol: TCP
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: chaptarr-ingress
+  name: calibre-ingress
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
@@ -112,35 +108,35 @@ metadata:
 spec:
   tls:
     - hosts:
-      - chaptarr.joeberry.org
+      - calibre.joeberry.org
   rules:
-  - host: chaptarr.joeberry.org
+  - host: calibre.joeberry.org
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: chaptarr-service
+            name: authentik-server
             port:
-              number: 8789
+              number: 9000
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: chaptarr-ingress-http
+  name: calibre-ingress-http
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
     traefik.ingress.kubernetes.io/router.middlewares: kube-system-redirect-to-https@kubernetescrd
 spec:
   rules:
-  - host: chaptarr.joeberry.org
+  - host: calibre.joeberry.org
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: chaptarr-service
+            name: authentik-server
             port:
-              number: 8789
+              number: 9000
