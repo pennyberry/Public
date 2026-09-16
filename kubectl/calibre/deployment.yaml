@@ -30,12 +30,15 @@ spec:
               subPath: calibre/config
             - mountPath: /cwa-book-ingest
               name: nfs
-              subPath: applications/qbittorrent-nox/volumes/downloads/calibre/ebooks                   
+              subPath: applications/qbittorrent-nox/volumes/downloads/calibre/ingest
           env:
             - name: NETWORK_SHARE_MODE
               value: "true"
             - name: CWA_PORT_OVERRIDE
               value: "8677"
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
       tolerations:
         - key: "node.kubernetes.io/unreachable"
           operator: "Exists"
@@ -140,3 +143,50 @@ spec:
             name: authentik-server
             port:
               number: 9000
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: calibre-file-copier
+  labels:
+    app: calibre-file-copier
+spec:
+  schedule: "*/10 * * * *"
+  concurrencyPolicy: Replace
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: calibre-file-copier
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: alpine
+              image: alpine:latest
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  #start a timer
+                  start_time=$(date +%s)
+                  #get files that have a last change time of less than 10 minutes and copy them to the ingest folder
+                  find /working/chaptarr/downloads/ -type f -mmin -10 -exec cp {} /working/calibre/ingest/ \;
+                  #log the files that were copied
+                  echo "Copied the following files to the ingest folder:"
+                  find /working/chaptarr/downloads/ -type f -mmin -10
+                  #stop the timer
+                  end_time=$(date +%s)
+                  #calculate the time taken
+                  time_taken=$((end_time - start_time))
+                  echo "Time taken to complete this job: $time_taken seconds"
+              volumeMounts:
+                - name: nfs
+                  mountPath: /working
+                  subPath: applications/qbittorrent-nox/volumes/downloads/
+          volumes:
+            - name: nfs
+              persistentVolumeClaim:
+                claimName: truenas-pvc              
