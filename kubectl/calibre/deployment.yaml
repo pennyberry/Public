@@ -28,6 +28,9 @@ spec:
             - mountPath: /config
               name: truenas-volume-calibre
               subPath: calibre/config
+            - mountPath: /calibre-library
+              name: truenas-volume-calibre
+              subPath: calibre/calibre-library              
             - mountPath: /cwa-book-ingest
               name: nfs
               subPath: applications/qbittorrent-nox/volumes/downloads/calibre/ingest
@@ -120,9 +123,9 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: authentik-server
+            name: calibre-service
             port:
-              number: 9000
+              number: 8677
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -140,9 +143,9 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: authentik-server
+            name: calibre-service
             port:
-              number: 9000
+              number: 8677
 ---
 apiVersion: batch/v1
 kind: CronJob
@@ -189,4 +192,4 @@ spec:
           volumes:
             - name: nfs
               persistentVolumeClaim:
-                claimName: truenas-pvc              
+                claimName: truenas-pvc
