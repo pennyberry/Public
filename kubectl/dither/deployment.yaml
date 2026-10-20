@@ -20,7 +20,7 @@ spec:
             - -c
             - |
               apk add --no-cache git ca-certificates && \
-              git clone https://github.com/shi-314/go-eink-dither /build && \
+              git clone https://github.com/pennyberry/go-eink-dither /build && \
               cd /build && \
               go mod download && \
               CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /app/main .
