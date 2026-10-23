@@ -51,7 +51,7 @@ spec:
             containers:
                 # Run whatever you want to ensure is going out the tunnel here
                 - name: qbittorrent
-                  image: qbittorrentofficial/qbittorrent-nox:5.2.4-lt2-1
+                  image: qbittorrentofficial/qbittorrent-nox:5.2.4-1
                   resources:
                     requests:
                       memory: "1Gi"
@@ -69,7 +69,7 @@ spec:
                         - "-c"
                         - "wget -q -O - http://localhost:8080/api/v2/transfer/info | grep '\"connection_status\":\"connected\"' || exit 1"
                     periodSeconds: 30
-                    initialDelaySeconds: 30
+                    initialDelaySeconds: 90
                     failureThreshold: 3
 
                   volumeMounts:
