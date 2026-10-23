@@ -51,7 +51,7 @@ spec:
             containers:
                 # Run whatever you want to ensure is going out the tunnel here
                 - name: qbittorrent
-                  image: qbittorrentofficial/qbittorrent-nox:latest
+                  image: qbittorrentofficial/qbittorrent-nox:5.2.4-lt2-1
                   resources:
                     requests:
                       memory: "1Gi"

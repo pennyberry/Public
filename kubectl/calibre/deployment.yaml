@@ -84,7 +84,7 @@ spec:
   storageClassName: truenas-nfs-calibre
   resources:
     requests:
-      storage: 100Gi
+      storage: 200Gi
 ---
 apiVersion: v1
 kind: Service
