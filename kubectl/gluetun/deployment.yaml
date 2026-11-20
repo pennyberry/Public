@@ -32,46 +32,15 @@ spec:
                   envFrom:
                     - secretRef:
                         name: gluetun-secrets
-                - name: curlpodtest
-                  image: alpine/curl
-                  ports:
-                    - containerPort: 80
-                      hostPort: 88
-                  command: ['/bin/sh', '-c']
-                  args:
-                      - &check-ip |
-                          IP=$(nslookup 123.joeberry.org | awk '/^Address: / { print $2 }')
-                          EXPECTED_IP=$(curl checkip.amazonaws.com)
-                          if [ "$IP" != "$EXPECTED_IP" ]; then
-                            echo "IP is different from $EXPECTED_IP. Current IP is $IP."
-                          else
-                            echo "IP is $EXPECTED_IP. Exiting..."
-                            exit 1
-                          fi
+                  volumeMounts:
+                      - mountPath: /scripts
+                        name: scripts
             containers:
-                # Run whatever you want to ensure is going out the tunnel here
                 - name: qbittorrent
-                  image: qbittorrentofficial/qbittorrent-nox:5.2.4-1
-                  resources:
-                    requests:
-                      memory: "1Gi"
-                      cpu: "100m"
-                    limits:
-                      memory: "2Gi"
-                      cpu: "1000m"
+                  image: qbittorrentofficial/qbittorrent-nox:5.2.4-lt2-1
                   envFrom:
                     - secretRef:
                         name: gluetun-secrets
-                  livenessProbe:
-                    exec:
-                      command:
-                        - "sh"
-                        - "-c"
-                        - "wget -q -O - http://localhost:8080/api/v2/transfer/info | grep '\"connection_status\":\"connected\"' || exit 1"
-                    periodSeconds: 30
-                    initialDelaySeconds: 90
-                    failureThreshold: 3
-
                   volumeMounts:
                     - mountPath: /config
                       name: nfs
@@ -81,13 +50,6 @@ spec:
                       subPath: applications/qbittorrent-nox/volumes/downloads
                 - name: mousehole
                   image: tmmrtn/mousehole:latest
-                  resources:
-                    requests:
-                      memory: "256Mi"
-                      cpu: "10m"
-                    limits:
-                      memory: "512Mi"
-                      cpu: "1000m"
                   envFrom:
                     - secretRef:
                         name: gluetun-secrets
@@ -99,6 +61,9 @@ spec:
               - name: nfs
                 persistentVolumeClaim:
                   claimName: truenas-pvc
+              - name: scripts
+                configMap:
+                    name: gluetun-scripts
 ---
 apiVersion: v1
 kind: Service
@@ -115,6 +80,22 @@ spec:
     - name: manage-http
       port: 8079
       targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gluetun-mousehole
+  annotations:
+    metallb.io/address-pool: internal-pool
+    metallb.io/allow-shared-ip: "shared-ip"
+spec:
+  type: LoadBalancer
+  selector:
+    app: gluetun
+  ports:
+    - name: manage-http
+      port: 5010
+      targetPort: 5010      
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -158,4 +139,48 @@ spec:
           service:
             name: gluetun
             port:
-              number: 8079              
+              number: 8079
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mousehole-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd, kube-system-security-headers@kubernetescrd
+    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
+spec:
+  tls:
+    - hosts:
+      - mousehole.joeberry.org
+  rules:
+  - host: mousehole.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: gluetun-mousehole
+            port:
+              number: 5010
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mousehole-ingress-http
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipallowlist-internal@kubernetescrd,kube-system-redirect-to-https@kubernetescrd
+spec:
+  rules:
+  - host: mousehole.joeberry.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: gluetun-mousehole
+            port:
+              number: 5010              
